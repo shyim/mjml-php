@@ -7,6 +7,8 @@ namespace Shyim\Mjml\Tests\Snapshot;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Shyim\Mjml\Mjml;
+use Shyim\Mjml\MjmlOptions;
+use Shyim\Mjml\Validation\ValidationLevel;
 
 /**
  * Snapshot tests that compare PHP rendering output against the original JS MJML CLI output.
@@ -30,7 +32,9 @@ final class SnapshotTest extends TestCase
         $expectedHtml = file_get_contents($htmlFile);
         self::assertNotFalse($expectedHtml, "Could not read reference HTML: {$htmlFile}. Run: npx mjml {$mjmlFile} -o {$htmlFile}");
 
-        $result = Mjml::render($mjml);
+        $result = Mjml::render($mjml, new MjmlOptions(
+            validationLevel: ValidationLevel::Skip,
+        ));
 
         $expected = self::normalizeHtml($expectedHtml);
         $actual = self::normalizeHtml($result->html);

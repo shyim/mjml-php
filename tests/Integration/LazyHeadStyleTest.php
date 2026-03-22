@@ -7,12 +7,14 @@ namespace Shyim\Mjml\Tests\Integration;
 use PHPUnit\Framework\TestCase;
 use Shyim\Mjml\Component\HeadComponent;
 use Shyim\Mjml\Mjml;
+use Shyim\Mjml\MjmlOptions;
+use Shyim\Mjml\Validation\ValidationLevel;
 
 final class LazyHeadStyleTest extends TestCase
 {
     public function testStyleCalledWithCorrectBreakpoint(): void
     {
-        $mjml = new Mjml();
+        $mjml = new Mjml(new MjmlOptions(validationLevel: ValidationLevel::Skip));
         $mjml->registerComponent(MjHeadComponentWithFunctionStyle::class);
 
         $result = $mjml->toHtml('

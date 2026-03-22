@@ -41,19 +41,14 @@ echo $result->html;
 ```php
 use Shyim\Mjml\Mjml;
 use Shyim\Mjml\MjmlOptions;
-use Shyim\Mjml\Validation\ValidationLevel;
 
 $result = Mjml::render($mjml, new MjmlOptions(
-    validationLevel: ValidationLevel::Strict,
-    minify: false,
-    beautify: false,
     keepComments: true,
     language: 'en',
     dir: 'ltr',
 ));
 
-echo $result->html;    // Rendered HTML
-echo $result->errors;  // Validation errors (if any)
+echo $result->html;
 ```
 
 ### Custom Components
@@ -103,21 +98,33 @@ $result = $mjml->toHtml('<mjml>...</mjml>');
 
 ## Validation
 
-MJML-PHP validates your markup and reports errors:
+MJML-PHP validates your markup and throws a `ValidationException` on errors:
 
 ```php
-$result = Mjml::render($mjml, new MjmlOptions(
-    validationLevel: ValidationLevel::Soft, // Soft (default), Strict, or Skip
-));
+use Shyim\Mjml\Validation\ValidationException;
+use Shyim\Mjml\Validation\ValidationLevel;
 
-foreach ($result->errors as $error) {
-    echo $error; // "Line 5: Attribute 'colr' is not allowed on mj-text (mj-text)"
+try {
+    $result = Mjml::render($mjml);
+} catch (ValidationException $e) {
+    echo $e->getMessage();
+
+    foreach ($e->errors as $error) {
+        echo $error; // "Line 5: Attribute 'colr' is not allowed on mj-text (mj-text)"
+    }
 }
 ```
 
+- **Strict** (default) — Validate and throw `ValidationException` on errors
 - **Skip** — No validation
-- **Soft** — Validate and collect errors, still render
-- **Strict** — Validate and stop on errors (returns empty HTML)
+
+To disable validation:
+
+```php
+$result = Mjml::render($mjml, new MjmlOptions(
+    validationLevel: ValidationLevel::Skip,
+));
+```
 
 ## MJML Compatibility
 

@@ -6,12 +6,16 @@ namespace Shyim\Mjml\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
 use Shyim\Mjml\Mjml;
+use Shyim\Mjml\MjmlOptions;
+use Shyim\Mjml\Validation\ValidationLevel;
 
 abstract class AbstractIntegrationTest extends TestCase
 {
     protected function renderMjml(string $mjml): string
     {
-        return Mjml::render($mjml)->html;
+        return Mjml::render($mjml, new MjmlOptions(
+            validationLevel: ValidationLevel::Skip,
+        ))->html;
     }
 
     /**

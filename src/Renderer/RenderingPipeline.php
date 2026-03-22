@@ -16,7 +16,7 @@ use Shyim\Mjml\Parser\Node;
 use Shyim\Mjml\Renderer\PostProcessor\CssInliner;
 use Shyim\Mjml\Renderer\PostProcessor\HtmlAttributeApplier;
 use Shyim\Mjml\Renderer\PostProcessor\OutlookConditionalMerger;
-use Shyim\Mjml\Validation\ValidationError;
+use Shyim\Mjml\Validation\ValidationException;
 use Shyim\Mjml\Validation\ValidationLevel;
 use Shyim\Mjml\Validation\Validator;
 
@@ -34,14 +34,12 @@ final class RenderingPipeline
         $root = $parser->parse($mjml, $this->options->filePath);
 
         // 2. Validate (if not Skip)
-        $errors = [];
         if ($this->options->validationLevel !== ValidationLevel::Skip) {
             $validator = new Validator($this->registry);
             $errors = $validator->validate($root);
 
-            if ($this->options->validationLevel === ValidationLevel::Strict && $errors !== []) {
-                // In strict mode, return early with errors
-                return new MjmlResult(html: '', json: $root, errors: $errors);
+            if ($errors !== []) {
+                throw new ValidationException($errors);
             }
         }
 
@@ -110,7 +108,7 @@ final class RenderingPipeline
         // 12. Clean up extra whitespace in output
         $html = $this->cleanOutput($html);
 
-        return new MjmlResult(html: $html, json: $root, errors: $errors);
+        return new MjmlResult(html: $html, json: $root);
     }
 
     private function processHead(Node $headNode, GlobalContext $globalContext): void

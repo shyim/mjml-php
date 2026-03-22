@@ -12,7 +12,7 @@ final readonly class MjmlOptions
      * @param array<string, string> $fonts Font name => URL map
      */
     public function __construct(
-        public ValidationLevel $validationLevel = ValidationLevel::Soft,
+        public ValidationLevel $validationLevel = ValidationLevel::Strict,
         public bool $minify = false,
         public bool $beautify = false,
         public bool $keepComments = true,
