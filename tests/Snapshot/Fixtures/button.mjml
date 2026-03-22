@@ -1,0 +1,9 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-button href="https://example.com" background-color="#007bff" color="#ffffff" border-radius="5px" font-size="16px" inner-padding="10px 25px">Click Me</mj-button>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

@@ -1,0 +1,14 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-group>
+        <mj-column>
+          <mj-text>Group Col 1</mj-text>
+        </mj-column>
+        <mj-column>
+          <mj-text>Group Col 2</mj-text>
+        </mj-column>
+      </mj-group>
+    </mj-section>
+  </mj-body>
+</mjml>

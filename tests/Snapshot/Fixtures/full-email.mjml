@@ -1,0 +1,54 @@
+<mjml>
+  <mj-head>
+    <mj-title>Newsletter</mj-title>
+    <mj-preview>Monthly Newsletter - March 2024</mj-preview>
+    <mj-attributes>
+      <mj-all font-family="Helvetica, Arial, sans-serif" />
+      <mj-text font-size="14px" color="#555555" line-height="1.6" />
+      <mj-section padding="20px 0" />
+    </mj-attributes>
+    <mj-style>
+      .footer-link { color: #888888; }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#1a1a2e" padding="20px">
+      <mj-column>
+        <mj-image src="https://example.com/logo.png" width="150px" alt="Logo" />
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#ffffff">
+      <mj-column>
+        <mj-text font-size="24px" font-weight="bold" color="#1a1a2e">Welcome to our Newsletter</mj-text>
+        <mj-text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</mj-text>
+        <mj-button href="https://example.com/read-more" background-color="#e94560" border-radius="25px" font-size="16px">Read More</mj-button>
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#ffffff">
+      <mj-column width="50%">
+        <mj-image src="https://example.com/article1.jpg" alt="Article 1" />
+        <mj-text font-weight="bold">Article One</mj-text>
+        <mj-text font-size="12px">Short description of article one.</mj-text>
+      </mj-column>
+      <mj-column width="50%">
+        <mj-image src="https://example.com/article2.jpg" alt="Article 2" />
+        <mj-text font-weight="bold">Article Two</mj-text>
+        <mj-text font-size="12px">Short description of article two.</mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#ffffff">
+      <mj-column>
+        <mj-divider border-color="#e0e0e0" />
+      </mj-column>
+    </mj-section>
+    <mj-section background-color="#1a1a2e" padding="20px">
+      <mj-column>
+        <mj-social font-size="12px" icon-size="24px" mode="horizontal">
+          <mj-social-element name="facebook" href="https://facebook.com">Facebook</mj-social-element>
+          <mj-social-element name="twitter" href="https://twitter.com">Twitter</mj-social-element>
+        </mj-social>
+        <mj-text align="center" color="#888888" font-size="11px">123 Street, City, Country</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

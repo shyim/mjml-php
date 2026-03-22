@@ -1,0 +1,10 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-image src="https://example.com/image.png" width="300px" alt="Example Image" />
+        <mj-image src="https://example.com/linked.png" href="https://example.com" width="200px" alt="Linked" target="_blank" />
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

@@ -1,0 +1,18 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-accordion border="1px solid #ccc" font-family="Arial">
+          <mj-accordion-element>
+            <mj-accordion-title font-size="14px">Question 1</mj-accordion-title>
+            <mj-accordion-text font-size="13px" padding="10px 25px">Answer to question 1</mj-accordion-text>
+          </mj-accordion-element>
+          <mj-accordion-element>
+            <mj-accordion-title font-size="14px">Question 2</mj-accordion-title>
+            <mj-accordion-text font-size="13px" padding="10px 25px">Answer to question 2</mj-accordion-text>
+          </mj-accordion-element>
+        </mj-accordion>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

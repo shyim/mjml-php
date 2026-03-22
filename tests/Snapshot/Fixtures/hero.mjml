@@ -1,0 +1,8 @@
+<mjml>
+  <mj-body>
+    <mj-hero mode="fixed-height" height="469px" background-width="600px" background-height="469px" background-url="https://example.com/hero-bg.jpg" background-color="#2f2936" padding="100px 0px">
+      <mj-text padding="20px" color="#ffffff" font-family="Helvetica" align="center" font-size="45px" line-height="45px" font-weight="900">GO</mj-text>
+      <mj-button href="https://example.com" align="center">ORDER NOW</mj-button>
+    </mj-hero>
+  </mj-body>
+</mjml>

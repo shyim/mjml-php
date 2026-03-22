@@ -1,0 +1,19 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text>Before raw</mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-raw>
+      <div class="custom-raw-content">
+        <p>This is raw HTML</p>
+      </div>
+    </mj-raw>
+    <mj-section>
+      <mj-column>
+        <mj-text>After raw</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

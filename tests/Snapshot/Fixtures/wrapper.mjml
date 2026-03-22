@@ -1,0 +1,16 @@
+<mjml>
+  <mj-body>
+    <mj-wrapper background-color="#eeeeee" padding="20px">
+      <mj-section background-color="#ffffff">
+        <mj-column>
+          <mj-text>Section inside wrapper</mj-text>
+        </mj-column>
+      </mj-section>
+      <mj-section background-color="#ffffff">
+        <mj-column>
+          <mj-text>Second section</mj-text>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>

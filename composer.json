@@ -1,0 +1,31 @@
+{
+    "name": "shyim/mjml-php",
+    "description": "Native PHP port of MJML - the email template engine",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.2",
+        "ext-dom": "*",
+        "ext-libxml": "*",
+        "tijsverkoyen/css-to-inline-styles": "^2.2"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.94",
+        "phpstan/phpstan": "^2.0",
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Shyim\\Mjml\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Shyim\\Mjml\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable"
+}

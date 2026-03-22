@@ -1,0 +1,22 @@
+<mjml>
+  <mj-head>
+    <mj-title>Test Email Title</mj-title>
+    <mj-preview>This is the preview text</mj-preview>
+    <mj-attributes>
+      <mj-all font-family="Arial, sans-serif" />
+      <mj-text font-size="14px" color="#333333" />
+      <mj-button background-color="#007bff" />
+    </mj-attributes>
+    <mj-style>
+      .custom-class { color: blue; }
+    </mj-style>
+  </mj-head>
+  <mj-body background-color="#f4f4f4">
+    <mj-section background-color="#ffffff">
+      <mj-column>
+        <mj-text>Text with global attributes</mj-text>
+        <mj-button href="https://example.com">Button with global bg</mj-button>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

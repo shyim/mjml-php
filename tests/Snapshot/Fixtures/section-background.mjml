@@ -1,0 +1,14 @@
+<mjml>
+  <mj-body>
+    <mj-section background-color="#f0f0f0" padding="20px 30px">
+      <mj-column>
+        <mj-text>With background color</mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section background-url="https://example.com/bg.jpg" background-size="cover" background-repeat="no-repeat">
+      <mj-column>
+        <mj-text color="#ffffff">With background image</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

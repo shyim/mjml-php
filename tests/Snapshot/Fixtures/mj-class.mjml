@@ -1,0 +1,17 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-class name="highlight" color="#ff0000" font-weight="bold" />
+      <mj-class name="small" font-size="11px" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text mj-class="highlight">Highlighted text</mj-text>
+        <mj-text mj-class="small">Small text</mj-text>
+        <mj-text mj-class="highlight small">Both classes</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

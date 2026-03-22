@@ -1,0 +1,9 @@
+<mjml>
+  <mj-body>
+    <mj-section full-width="full-width" background-color="#ff6600">
+      <mj-column>
+        <mj-text color="#ffffff">Full width section</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

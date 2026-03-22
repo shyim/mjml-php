@@ -1,0 +1,85 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Shyim\Mjml\Tests\Integration;
+
+final class TableWidthTest extends AbstractIntegrationTest
+{
+    public function testTableWidthValues(): void
+    {
+        $mjml = '
+        <mjml>
+            <mj-body>
+                <mj-wrapper>
+                    <mj-section>
+                        <mj-column>
+                            <mj-table css-class="table">
+                                <tr>
+                                    <th style="border: 1px solid black;text-align: left;">
+                                        Default Width
+                                    </th>
+                                    <td style="border: 1px solid black;">
+                                        100%
+                                    </td>
+                                </tr>
+                            </mj-table>
+                        </mj-column>
+                    </mj-section>
+                    <mj-section>
+                        <mj-column>
+                            <mj-table width="500px" css-class="table">
+                                <tr>
+                                    <th style="border: 1px solid black;text-align: left;">
+                                        Pixel Width
+                                    </th>
+                                    <td style="border: 1px solid black;">
+                                        500px
+                                    </td>
+                                </tr>
+                            </mj-table>
+                        </mj-column>
+                    </mj-section>
+                    <mj-section>
+                        <mj-column>
+                            <mj-table width="80%" css-class="table">
+                                <tr>
+                                    <th style="border: 1px solid black;text-align: left;">
+                                        Percentage Width
+                                    </th>
+                                    <td style="border: 1px solid black;">
+                                        80%
+                                    </td>
+                                </tr>
+                            </mj-table>
+                        </mj-column>
+                    </mj-section>
+                    <mj-section css-class="section">
+                        <mj-column>
+                            <mj-table width="auto" css-class="table">
+                                <tr>
+                                    <th style="border: 1px solid black;text-align: left;">
+                                        Auto Width
+                                    </th>
+                                    <td style="border: 1px solid black;">
+                                        Auto
+                                    </td>
+                                </tr>
+                            </mj-table>
+                        </mj-column>
+                    </mj-section>
+                </mj-wrapper>
+            </mj-body>
+        </mjml>';
+
+        $html = $this->renderMjml($mjml);
+
+        // width attribute values
+        $widthAttrs = $this->collectAttributeValues($html, '.table table', 'width');
+        self::assertSame(['100%', '500', '80%', 'auto'], $widthAttrs);
+
+        // width CSS style values
+        $widthStyles = $this->collectStyleValues($html, '.table table', 'width');
+        self::assertSame(['100%', '500px', '80%', 'auto'], $widthStyles);
+    }
+}

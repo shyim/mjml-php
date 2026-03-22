@@ -1,0 +1,12 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text>Before divider</mj-text>
+        <mj-divider border-color="#cccccc" border-width="2px" border-style="dashed" width="80%" />
+        <mj-spacer height="30px" />
+        <mj-text>After spacer</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

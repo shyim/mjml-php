@@ -1,0 +1,12 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column background-color="#f0f0f0" border="1px solid #ccc" border-radius="8px" padding="20px" vertical-align="middle">
+        <mj-text>Styled column</mj-text>
+      </mj-column>
+      <mj-column width="200px" background-color="#e0e0e0">
+        <mj-text>Fixed width column</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
