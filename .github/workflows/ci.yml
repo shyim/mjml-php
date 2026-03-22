@@ -10,31 +10,39 @@ jobs:
     name: Code Style
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v5
 
-      - uses: shivammathur/setup-php@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v3
         with:
           php-version: '8.2'
           coverage: none
 
-      - run: composer install --no-progress
+      - name: Install dependencies
+        run: composer install --no-progress
 
-      - run: vendor/bin/php-cs-fixer fix --dry-run --diff
+      - name: Run PHP-CS-Fixer
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff
 
   phpstan:
     name: PHPStan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v5
 
-      - uses: shivammathur/setup-php@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v3
         with:
           php-version: '8.2'
           coverage: none
 
-      - run: composer install --no-progress
+      - name: Install dependencies
+        run: composer install --no-progress
 
-      - run: vendor/bin/phpstan analyse
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse
 
   phpunit:
     name: PHPUnit (PHP ${{ matrix.php }})
@@ -44,13 +52,17 @@ jobs:
       matrix:
         php: ['8.2', '8.3', '8.4', '8.5']
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v5
 
-      - uses: shivammathur/setup-php@v2
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v3
         with:
           php-version: ${{ matrix.php }}
           coverage: none
 
-      - run: composer install --no-progress
+      - name: Install dependencies
+        run: composer install --no-progress
 
-      - run: vendor/bin/phpunit
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
