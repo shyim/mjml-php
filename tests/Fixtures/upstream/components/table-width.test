@@ -1,0 +1,41 @@
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-wrapper>
+      <mj-section>
+        <mj-column>
+          <mj-table css-class="table"><tr><td>Default Width</td></tr></mj-table>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-table width="500px" css-class="table"><tr><td>Pixel Width</td></tr></mj-table>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-table width="80%" css-class="table"><tr><td>Percentage Width</td></tr></mj-table>
+        </mj-column>
+      </mj-section>
+      <mj-section>
+        <mj-column>
+          <mj-table width="auto" css-class="table"><tr><td>Auto Width</td></tr></mj-table>
+        </mj-column>
+      </mj-section>
+    </mj-wrapper>
+  </mj-body>
+</mjml>
+
+--HTML--
+width="100%"
+width:100%;
+width="500"
+width:500px;
+width="80%"
+width:80%;
+width="auto"
+width:auto;
+Default Width
+Pixel Width
+Percentage Width
+Auto Width

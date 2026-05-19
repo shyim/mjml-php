@@ -1,0 +1,24 @@
+--OPTIONS--
+minify: true
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-raw>
+          <!-- htmlmin:ignore -->
+          <div class="preserve   this   spacing">keep   whitespace</div>
+          <!-- htmlmin:ignore -->
+        </mj-raw>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+preserve   this   spacing
+keep   whitespace
+
+--HTML-NOT--
+htmlmin:ignore

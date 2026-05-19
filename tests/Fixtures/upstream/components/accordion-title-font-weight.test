@@ -1,0 +1,33 @@
+--MJML--
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-accordion border="none" padding="1px" />
+      <mj-accordion-title font-family="Roboto, Open Sans, Helvetica, Arial, sans-serif" background-color="#fff" color="#031017" padding="15px" font-size="18px" />
+      <mj-accordion-text font-family="Open Sans, Helvetica, Arial, sans-serif" background-color="#fafafa" padding="15px" color="#505050" font-size="14px" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body>
+    <mj-section padding="20px" background-color="#ffffff">
+      <mj-column background-color="#dededd">
+        <mj-accordion>
+          <mj-accordion-element>
+            <mj-accordion-title font-weight="bold" css-class="accordion-title">Why use an accordion?</mj-accordion-title>
+            <mj-accordion-text font-weight="bold">Content one</mj-accordion-text>
+          </mj-accordion-element>
+          <mj-accordion-element>
+            <mj-accordion-title font-weight="700" css-class="accordion-title">How it works</mj-accordion-title>
+            <mj-accordion-text font-weight="700">Content two</mj-accordion-text>
+          </mj-accordion-element>
+        </mj-accordion>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+class="accordion-title"
+font-weight:bold;
+font-weight:700;
+Why use an accordion?
+How it works

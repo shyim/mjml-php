@@ -190,6 +190,8 @@ final class RenderingPipeline
 
     private function minifyOutput(string $html): string
     {
+        $html = $this->stripHtmlminIgnoreMarkers($html);
+
         // Dependency-free conservative minification: remove whitespace between tags
         // and trim leading/trailing whitespace, while preserving text and style content.
         $html = preg_replace('/>\s+</', '><', $html) ?? $html;
@@ -199,10 +201,17 @@ final class RenderingPipeline
 
     private function beautifyOutput(string $html): string
     {
+        $html = $this->stripHtmlminIgnoreMarkers($html);
+
         // Dependency-free lightweight beautification: make tag boundaries readable
         // without attempting to reindent or parse non-standard conditional markup.
         $html = preg_replace('/>(?=<)/', ">\n", $html) ?? $html;
 
         return trim($html) . "\n";
+    }
+
+    private function stripHtmlminIgnoreMarkers(string $html): string
+    {
+        return preg_replace('/\s*<!--\s*htmlmin:ignore\s*-->\s*/i', '', $html) ?? $html;
     }
 }

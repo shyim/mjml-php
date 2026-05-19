@@ -1,0 +1,32 @@
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-accordion css-class="my-accordion-1" font-family="serif">
+          <mj-accordion-element>
+            <mj-accordion-title>Why use an accordion?</mj-accordion-title>
+            <mj-accordion-text>Accordion text</mj-accordion-text>
+          </mj-accordion-element>
+        </mj-accordion>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-accordion css-class="my-accordion-2" font-family="serif">
+          <mj-accordion-element font-family="sans-serif">
+            <mj-accordion-title font-family="monospace">Why use an accordion?</mj-accordion-title>
+            <mj-accordion-text font-family="monospace">Accordion text</mj-accordion-text>
+          </mj-accordion-element>
+        </mj-accordion>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+class="my-accordion-1"
+font-family:serif;
+class="my-accordion-2"
+font-family:monospace;
+Accordion text

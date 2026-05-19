@@ -1,0 +1,17 @@
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-social mode="vertical">
+          <mj-social-element name="facebook" href="https://mjml.io/" icon-position="right" align="right" css-class="my-social-element">Facebook</mj-social-element>
+        </mj-social>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+class="my-social-element"
+text-align:right;
+Facebook

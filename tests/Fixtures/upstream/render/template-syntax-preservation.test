@@ -1,0 +1,29 @@
+--OPTIONS--
+minify: true
+
+--MJML--
+<mjml>
+  <mj-head>
+    <mj-style>.title { color: {{headlineColor}}; }</mj-style>
+  </mj-head>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-raw><div style="color: {{primaryColor}}; font-weight: [[ fontWeight ]];">Token</div></mj-raw>
+        <mj-raw><div style="[[ fontTag ]]: [[ fontWeight ]];">Property token</div></mj-raw>
+        <mj-text>{% for item in items %}{{ item }}{% endfor %}</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+{{headlineColor}}
+{{primaryColor}}
+[[ fontWeight ]]
+[[ fontTag ]]
+{% for item in items %}
+{{ item }}
+{% endfor %}
+Token
+Property token
