@@ -1,0 +1,18 @@
+--OPTIONS--
+beautify: true
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-raw><div id="beautify-raw-comment"><!--   keep this spacing   --><span data-kind="raw">Raw</span></div></mj-raw>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+id="beautify-raw-comment"
+<!--   keep this spacing   -->
+<span data-kind="raw">Raw</span>

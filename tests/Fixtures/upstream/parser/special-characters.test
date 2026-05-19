@@ -1,0 +1,29 @@
+--OPTIONS--
+validationLevel: skip
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section background-color="#CCCCCC" full-width="full-width">
+      <mj-button href="&lt;% dynamic %&gt;" pouf="$2">
+        &amp;end<br />
+        Blu &amp; end $1
+        &amp;amp;
+        lorem
+      </mj-button>
+      <mj-button href="https://mjml.io?encodedUrl=https%3A%2F%2Fmjml.io&amp;coin=coi">Blu</mj-button>
+      <mj-button href="&amp;é(§&amp;è!çà)">https%3A%2F%2Fmjml.io</mj-button>
+      <mj-raw><coin color="#CCCCCC">bla</coin></mj-raw>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+href="<% dynamic %>"
+&amp;end<br />
+Blu &amp; end $1
+&amp;amp;
+href="https://mjml.io?encodedUrl=https%3A%2F%2Fmjml.io&coin=coi"
+href="&é(§&è!çà)"
+https%3A%2F%2Fmjml.io
+<coin color="#CCCCCC">bla</coin>

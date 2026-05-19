@@ -1,0 +1,27 @@
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-button border-radius="10px">Button 10px</mj-button>
+        <mj-button border-radius="10% 20%">Button 10% 20%</mj-button>
+        <mj-button border-radius="10px 20px 30px">Button 10px 20px 30px</mj-button>
+        <mj-button border-radius="10px 20% 30px 40%">Button complex</mj-button>
+        <mj-button border-radius="100px 50px 100px 50px / 50px 50px 50px 50px">Button slash</mj-button>
+        <mj-image src="https://example.com/img.png" border-radius="10% 20%" />
+        <mj-section border-radius="10px 20px 30px">
+          <mj-column border-radius="10px 20% 30px 40%" inner-border-radius="100px 50px 100px 50px / 50px 50px 50px 50px" padding="20px">
+            <mj-text>Nested radius</mj-text>
+          </mj-column>
+        </mj-section>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+border-radius:10px;
+border-radius:10% 20%;
+border-radius:10px 20px 30px;
+border-radius:10px 20% 30px 40%;
+border-radius:100px 50px 100px 50px / 50px 50px 50px 50px;

@@ -1,0 +1,18 @@
+--OPTIONS--
+beautify: true
+
+--MJML--
+<mjml>
+  <mj-raw position="file-start">This will be added at the beginning of the file</mj-raw>
+  <mj-body>
+    <!-- Your content goes here -->
+  </mj-body>
+</mjml>
+
+--HTML-RAW--
+This will be added at the beginning of the file
+<!doctype html>
+
+--HTML--
+<!-- Your content goes here -->
+<head>

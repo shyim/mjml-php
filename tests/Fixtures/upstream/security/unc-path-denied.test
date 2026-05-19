@@ -1,0 +1,17 @@
+--OPTIONS--
+ignoreIncludes: false
+filePath: root
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-include path="//server/share/file.mjml" />
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+mj-include denied

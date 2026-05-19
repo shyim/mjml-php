@@ -1,0 +1,24 @@
+--OPTIONS--
+ignoreIncludes: false
+filePath: root
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-include path="../common1/header.mjml" />
+        <mj-include path="../common2/footer.mjml" />
+        <mj-include path="../common1/styles.css" type="css" />
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+mj-include denied
+
+--HTML-NOT--
+Common1 Header
+Common2 Footer
+color:#ff0000

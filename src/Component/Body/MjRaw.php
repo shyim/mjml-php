@@ -37,6 +37,10 @@ final class MjRaw extends BodyComponent
 
     public function render(): string
     {
+        if ($this->getAttribute('position') === 'file-start') {
+            return '';
+        }
+
         return $this->getContent();
     }
 }

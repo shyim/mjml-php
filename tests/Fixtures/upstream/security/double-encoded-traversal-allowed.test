@@ -1,0 +1,21 @@
+--OPTIONS--
+ignoreIncludes: false
+filePath: root
+includePath: security-sibling
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-include path="templates%252F..%252F..%252Fsecurity-sibling%252Fheader.mjml" />
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+Security Header
+
+--HTML-NOT--
+mj-include denied

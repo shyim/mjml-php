@@ -1,0 +1,20 @@
+--OPTIONS--
+ignoreIncludes: false
+filePath: root
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-include path="templates/../../common1/header.mjml" />
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+mj-include denied
+
+--HTML-NOT--
+Common1 Header

@@ -70,6 +70,12 @@ final class RenderingPipeline
         $bodyContent = '';
         $rawBeforeDoctype = '';
 
+        foreach ($root->children as $child) {
+            if ($child->tagName === 'mj-raw' && ($child->attributes['position'] ?? '') === 'file-start') {
+                $rawBeforeDoctype .= trim($child->content);
+            }
+        }
+
         if ($bodyNode !== null) {
             // Handle raw elements at file-start position
             foreach ($bodyNode->children as $child) {

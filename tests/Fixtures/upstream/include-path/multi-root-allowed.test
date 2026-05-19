@@ -1,0 +1,27 @@
+--OPTIONS--
+ignoreIncludes: false
+filePath: root
+includePath: common1, common2
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-include path="../common1/header.mjml" />
+        <mj-include path="../common2/footer.mjml" />
+        <mj-include path="../common1/styles.css" type="css" />
+        <mj-include path="../common2/snippet.html" type="html" />
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+Common1 Header
+Common2 Footer
+color:#ff0000
+id="snippet"
+
+--HTML-NOT--
+mj-include denied

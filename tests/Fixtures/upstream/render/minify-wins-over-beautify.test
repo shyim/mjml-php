@@ -1,0 +1,21 @@
+--OPTIONS--
+minify: true
+beautify: true
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text>Minify wins</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+Minify wins
+
+--HTML-NOT-RAW--
+>
+<
