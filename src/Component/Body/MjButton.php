@@ -146,7 +146,7 @@ final class MjButton extends BodyComponent
 
     public function render(): string
     {
-        $tag = $this->getAttribute('href') !== null ? 'a' : 'p';
+        $tag = $this->getAttribute('href') ? 'a' : 'p';
 
         $bgColor = $this->getAttribute('background-color');
 

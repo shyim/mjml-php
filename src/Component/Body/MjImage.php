@@ -31,9 +31,10 @@ final class MjImage extends BodyComponent
             'border-left' => 'string',
             'border-right' => 'string',
             'border-top' => 'string',
-            'border-radius' => 'unit(px,%){1,4}',
+            'border-radius' => 'string',
             'container-background-color' => 'color',
             'fluid-on-mobile' => 'boolean',
+            'full-width' => 'enum(full-width,false,)',
             'padding' => 'unit(px,%){1,4}',
             'padding-bottom' => 'unit(px,%)',
             'padding-left' => 'unit(px,%)',
@@ -48,6 +49,9 @@ final class MjImage extends BodyComponent
         ];
     }
 
+    /**
+     * @return array<string, string|null>
+     */
     public static function defaultAttributes(): array
     {
         return [
@@ -55,6 +59,7 @@ final class MjImage extends BodyComponent
             'align' => 'center',
             'border' => '0',
             'height' => 'auto',
+            'full-width' => null,
             'padding' => '10px 25px',
             'target' => '_blank',
             'font-size' => '13px',
@@ -163,7 +168,7 @@ final class MjImage extends BodyComponent
         // Register head style for fluid-on-mobile support
         $this->globalContext->addHeadStyle('mj-image', fn(string $breakpoint) => $this->getHeadStyle());
 
-        $fluidOnMobile = $this->getAttribute('fluid-on-mobile') === 'true';
+        $fluidOnMobile = $this->getAttribute('fluid-on-mobile') !== null;
 
         return '<table' . $this->htmlAttributes([
             'border' => '0',

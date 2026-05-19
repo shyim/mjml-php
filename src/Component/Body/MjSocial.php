@@ -17,7 +17,7 @@ final class MjSocial extends BodyComponent
     {
         return [
             'align' => 'enum(left,right,center)',
-            'border-radius' => 'unit(px,%)',
+            'border-radius' => 'string',
             'container-background-color' => 'color',
             'color' => 'color',
             'font-family' => 'string',

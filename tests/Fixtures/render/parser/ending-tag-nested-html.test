@@ -1,0 +1,13 @@
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text><div><span>Hello <strong>nested</strong></span></div></mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+<div><span>Hello <strong>nested</strong></span></div>

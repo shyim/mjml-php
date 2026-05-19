@@ -1,0 +1,15 @@
+--MJML--
+<mjml>
+  <mj-body>
+    <!-- fixture comment -->
+    <mj-section>
+      <mj-column>
+        <mj-text>After comment</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+<!-- fixture comment -->
+After comment

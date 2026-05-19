@@ -26,7 +26,7 @@ interface ComponentInterface
     /**
      * Default values for attributes.
      *
-     * @return array<string, string>
+     * @return array<string, string|null>
      */
     public static function defaultAttributes(): array;
 

@@ -1,0 +1,10 @@
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-text>Invalid child</mj-text>
+  </mj-body>
+</mjml>
+
+--ERRORS--
+mj-text cannot be used inside mj-body
+(mj-text)

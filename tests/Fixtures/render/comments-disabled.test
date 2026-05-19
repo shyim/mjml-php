@@ -1,0 +1,20 @@
+--OPTIONS--
+keepComments: false
+
+--MJML--
+<mjml>
+  <mj-body>
+    <!-- fixture comment hidden -->
+    <mj-section>
+      <mj-column>
+        <mj-text>After hidden comment</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+After hidden comment
+
+--HTML-NOT--
+fixture comment hidden

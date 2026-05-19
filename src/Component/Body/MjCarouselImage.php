@@ -29,9 +29,9 @@ final class MjCarouselImage extends BodyComponent
             'src' => 'string',
             'thumbnails-src' => 'string',
             'thumbnails' => 'enum(visible,hidden,supported)',
-            'border-radius' => 'unit(px,%){1,4}',
+            'border-radius' => 'string',
             'tb-border' => 'string',
-            'tb-border-radius' => 'unit(px,%){1,4}',
+            'tb-border-radius' => 'string',
             'tb-width' => 'unit(px,%)',
             'css-class' => 'string',
             'carouselId' => 'string',
@@ -88,14 +88,14 @@ final class MjCarouselImage extends BodyComponent
         $tbWidth = $this->getAttribute('tb-width') ?? '';
         $target = $this->getAttribute('target') ?? '_blank';
         $imgIndex = $this->renderContext->index + 1;
-        $cssClass = $this->getAttribute('css-class') ? $this->getAttribute('css-class') . '-thumbnail' : '';
+        $cssClass = self::suffixCssClasses($this->getAttribute('css-class'), 'thumbnail');
 
         return '<a'
             . $this->htmlAttributes([
                 'style' => 'thumbnails-a',
                 'href' => '#' . $imgIndex,
                 'target' => $target,
-                'class' => "mj-carousel-thumbnail mj-carousel-{$carouselId}-thumbnail mj-carousel-{$carouselId}-thumbnail-{$imgIndex} {$cssClass}",
+                'class' => "mj-carousel-thumbnail mj-carousel-{$carouselId}-thumbnail mj-carousel-{$carouselId}-thumbnail-{$imgIndex}" . ($cssClass !== '' ? " {$cssClass}" : ''),
             ])
             . '><label'
             . $this->htmlAttributes([

@@ -43,13 +43,21 @@ final class MjHero extends BodyComponent
         ];
     }
 
+    /**
+     * @return array<string, string|null>
+     */
     public static function defaultAttributes(): array
     {
         return [
             'mode' => 'fixed-height',
             'height' => '0px',
+            'background-url' => null,
             'background-position' => 'center center',
             'padding' => '0px',
+            'padding-top' => null,
+            'padding-bottom' => null,
+            'padding-left' => null,
+            'padding-right' => null,
             'background-color' => '#ffffff',
             'vertical-align' => 'top',
         ];
@@ -70,6 +78,8 @@ final class MjHero extends BodyComponent
     protected function getStyles(): array
     {
         $containerWidth = $this->renderContext->containerWidth;
+        $childContext = $this->getChildContext();
+        $currentContainerWidth = $childContext->containerWidth;
         $bgHeight = (int) ($this->getAttribute('background-height') ?? '0');
         $bgWidth = (int) ($this->getAttribute('background-width') ?? '1');
         $backgroundRatio = $bgWidth > 0 ? (int) round(($bgHeight / $bgWidth) * 100) : 0;
@@ -100,7 +110,7 @@ final class MjHero extends BodyComponent
                 'mso-line-height-rule' => 'exactly',
             ],
             'outlook-inner-table' => [
-                'width' => $containerWidth,
+                'width' => $currentContainerWidth,
             ],
             'outlook-image' => [
                 'border' => '0',
@@ -128,6 +138,11 @@ final class MjHero extends BodyComponent
                 'float' => $this->getAttribute('align'),
                 'margin' => '0px auto',
                 'width' => $this->getAttribute('width'),
+                'padding' => $this->getAttribute('inner-padding'),
+                'padding-top' => $this->getAttribute('inner-padding-top'),
+                'padding-left' => $this->getAttribute('inner-padding-left'),
+                'padding-right' => $this->getAttribute('inner-padding-right'),
+                'padding-bottom' => $this->getAttribute('inner-padding-bottom'),
             ],
         ];
     }
@@ -151,7 +166,9 @@ final class MjHero extends BodyComponent
     private function renderContent(): string
     {
         $containerWidth = $this->renderContext->containerWidth;
-        $containerWidthNum = (int) $containerWidth;
+        $childContext = $this->getChildContext();
+        $currentContainerWidth = $childContext->containerWidth;
+        $currentContainerWidthNum = (int) $currentContainerWidth;
 
         $childrenHtml = $this->renderChildren(
             renderer: function (BodyComponent $component): string {
@@ -189,7 +206,7 @@ final class MjHero extends BodyComponent
                 'cellpadding' => '0',
                 'cellspacing' => '0',
                 'style' => 'outlook-inner-table',
-                'width' => (string) $containerWidthNum,
+                'width' => (string) $currentContainerWidthNum,
             ])
             . '><tr><td' . $this->htmlAttributes(['style' => 'outlook-inner-td']) . '>'
             . '<![endif]-->'

@@ -10,6 +10,7 @@ final readonly class MjmlOptions
 {
     /**
      * @param array<string, string> $fonts Font name => URL map
+     * @param list<string>|null $includePath Additional root directories allowed for mj-include
      */
     public function __construct(
         public ValidationLevel $validationLevel = ValidationLevel::Strict,
@@ -26,5 +27,7 @@ final readonly class MjmlOptions
             'Ubuntu' => 'https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700',
         ],
         public ?string $filePath = null,
+        public bool $ignoreIncludes = true,
+        public ?array $includePath = null,
     ) {}
 }

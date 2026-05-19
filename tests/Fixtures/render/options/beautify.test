@@ -1,0 +1,20 @@
+--OPTIONS--
+beautify: true
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text>Hello options</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+Hello options
+
+--HTML-RAW--
+>
+<

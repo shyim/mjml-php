@@ -19,6 +19,7 @@ final class MjBody extends BodyComponent
         return [
             'width' => 'unit(px)',
             'background-color' => 'color',
+            'id' => 'string',
         ];
     }
 
@@ -40,6 +41,7 @@ final class MjBody extends BodyComponent
     {
         return [
             'div' => [
+                'word-spacing' => 'normal',
                 'background-color' => $this->getAttribute('background-color'),
             ],
         ];
@@ -52,25 +54,32 @@ final class MjBody extends BodyComponent
             $this->globalContext->backgroundColor = $bgColor;
         }
 
+        $bodyId = $this->getAttribute('id');
+        if ($bodyId !== null) {
+            $this->globalContext->bodyId = $bodyId;
+        }
+
+        $bodyCssClass = $this->getAttribute('css-class');
+        if ($bodyCssClass !== null) {
+            $this->globalContext->bodyCssClass = $bodyCssClass;
+        }
+
         $title = $this->globalContext->title;
         $lang = $this->globalContext->language;
         $dir = $this->globalContext->dir;
 
-        $attrs = [];
+        // Inner <div>
+        $divAttrs = [];
         if ($title !== '') {
-            $attrs['aria-label'] = $title;
+            $divAttrs['aria-label'] = $title;
         }
-        $attrs['aria-roledescription'] = 'email';
-        $cssClass = $this->getAttribute('css-class');
-        if ($cssClass !== null) {
-            $attrs['class'] = $cssClass;
-        }
-        $attrs['style'] = 'div';
-        $attrs['role'] = 'article';
-        $attrs['lang'] = $lang;
-        $attrs['dir'] = $dir;
+        $divAttrs['aria-roledescription'] = 'email';
+        $divAttrs['role'] = 'article';
+        $divAttrs['lang'] = $lang;
+        $divAttrs['dir'] = $dir;
+        $divAttrs['style'] = 'div';
 
-        return '<div' . $this->htmlAttributes($attrs) . '>'
+        return '<div' . $this->htmlAttributes($divAttrs) . '>'
             . $this->renderChildren()
             . '</div>';
     }

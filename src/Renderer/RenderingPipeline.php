@@ -30,7 +30,7 @@ final class RenderingPipeline
     public function execute(string $mjml): MjmlResult
     {
         // 1. Parse MJML string to Node tree
-        $parser = new MjmlParser($this->registry);
+        $parser = new MjmlParser($this->registry, $this->options);
         $root = $parser->parse($mjml, $this->options->filePath);
 
         // 2. Validate (if not Skip)
@@ -108,6 +108,12 @@ final class RenderingPipeline
         // 12. Clean up extra whitespace in output
         $html = $this->cleanOutput($html);
 
+        if ($this->options->minify) {
+            $html = $this->minifyOutput($html);
+        } elseif ($this->options->beautify) {
+            $html = $this->beautifyOutput($html);
+        }
+
         return new MjmlResult(html: $html, json: $root);
     }
 
@@ -174,5 +180,23 @@ final class RenderingPipeline
         $html = preg_replace('/^\s*\n/m', '', $html) ?? $html;
 
         return $html;
+    }
+
+    private function minifyOutput(string $html): string
+    {
+        // Dependency-free conservative minification: remove whitespace between tags
+        // and trim leading/trailing whitespace, while preserving text and style content.
+        $html = preg_replace('/>\s+</', '><', $html) ?? $html;
+
+        return trim($html);
+    }
+
+    private function beautifyOutput(string $html): string
+    {
+        // Dependency-free lightweight beautification: make tag boundaries readable
+        // without attempting to reindent or parse non-standard conditional markup.
+        $html = preg_replace('/>(?=<)/', ">\n", $html) ?? $html;
+
+        return trim($html) . "\n";
     }
 }

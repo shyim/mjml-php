@@ -89,7 +89,8 @@ class MjSection extends BodyComponent
         }
 
         $gap = $this->renderContext->sectionGap;
-        $marginTop = (!$isFirstSection && $gap > 0) ? $gap . 'px' : null;
+        $hasGap = $gap !== null && $gap !== '';
+        $marginTop = (!$isFirstSection && $hasGap) ? $gap : null;
 
         return [
             'tableFullwidth' => array_merge(
@@ -193,6 +194,7 @@ class MjSection extends BodyComponent
         $containerWidth = $this->renderContext->containerWidth;
         $isFirstSection = $this->renderContext->index === 0;
         $gap = $this->renderContext->sectionGap;
+        $hasGap = $gap !== null && $gap !== '';
 
         $bgcolorAttr = [];
         $bgColor = $this->getAttribute('background-color');
@@ -203,8 +205,8 @@ class MjSection extends BodyComponent
         $outlookClass = self::suffixCssClasses($this->getAttribute('css-class'), 'outlook');
 
         $styleAttrs = ['width' => $containerWidth];
-        if (!$isFirstSection && $gap > 0) {
-            $styleAttrs['padding-top'] = $gap . 'px';
+        if (!$isFirstSection && $hasGap) {
+            $styleAttrs['padding-top'] = $gap;
         }
 
         $attrs = [
@@ -217,7 +219,7 @@ class MjSection extends BodyComponent
             'style' => $styleAttrs,
             'width' => (string) (int) ((float) $containerWidth),
         ];
-        if ($gap <= 0) {
+        if (!$hasGap) {
             $attrs = array_merge($attrs, $bgcolorAttr);
         }
 
@@ -452,19 +454,4 @@ class MjSection extends BodyComponent
         return $this->isFullWidth() ? $this->renderFullWidth() : $this->renderSimple();
     }
 
-    /**
-     * Suffix each CSS class with the given suffix.
-     * "foo bar" with suffix "outlook" becomes "foo-outlook bar-outlook".
-     */
-    protected static function suffixCssClasses(?string $classes, string $suffix): string
-    {
-        if ($classes === null || $classes === '') {
-            return '';
-        }
-
-        $parts = explode(' ', $classes);
-        $suffixed = array_map(static fn(string $c): string => "{$c}-{$suffix}", $parts);
-
-        return implode(' ', $suffixed);
-    }
 }

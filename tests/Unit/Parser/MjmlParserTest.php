@@ -6,7 +6,9 @@ namespace Shyim\Mjml\Tests\Unit\Parser;
 
 use PHPUnit\Framework\TestCase;
 use Shyim\Mjml\Component\ComponentRegistry;
+use Shyim\Mjml\MjmlOptions;
 use Shyim\Mjml\Parser\MjmlParser;
+use Shyim\Mjml\Validation\ValidationLevel;
 
 final class MjmlParserTest extends TestCase
 {
@@ -308,18 +310,24 @@ final class MjmlParserTest extends TestCase
     public function testInclude(): void
     {
         $fixtureDir = __DIR__ . '/Fixtures';
+        $options = new MjmlOptions(
+            validationLevel: ValidationLevel::Skip,
+            ignoreIncludes: false,
+            filePath: $fixtureDir,
+        );
+        $parser = new MjmlParser(ComponentRegistry::withDefaults(), $options);
 
         $mjml = <<<MJML
         <mjml>
           <mj-body>
             <mj-section>
-              <mj-include path="{$fixtureDir}/incl.mjml" />
+              <mj-include path="incl.mjml" />
             </mj-section>
           </mj-body>
         </mjml>
         MJML;
 
-        $node = $this->parser->parse($mjml, $fixtureDir . '/test.mjml');
+        $node = $parser->parse($mjml, $fixtureDir . '/test.mjml');
 
         self::assertSame('mjml', $node->tagName);
 
@@ -373,6 +381,301 @@ final class MjmlParserTest extends TestCase
         self::assertSame('mj-raw', $raw->tagName);
         self::assertSame('test', $raw->attributes['test']);
         self::assertSame('<?php endif ?>', trim($raw->content));
+    }
+
+    public function testIncludeIgnoredByDefault(): void
+    {
+        $fixtureDir = __DIR__ . '/Fixtures';
+        // Default options have ignoreIncludes: true
+        $parser = new MjmlParser(ComponentRegistry::withDefaults());
+
+        $mjml = <<<MJML
+        <mjml>
+          <mj-body>
+            <mj-section>
+              <mj-include path="incl.mjml" />
+            </mj-section>
+          </mj-body>
+        </mjml>
+        MJML;
+
+        $node = $parser->parse($mjml, $fixtureDir . '/test.mjml');
+
+        $body = $node->children[0];
+        $section = $body->children[0];
+        // Include was ignored — section should have no children
+        self::assertCount(0, $section->children);
+    }
+
+    public function testIncludeDeniedPathTraversal(): void
+    {
+        $fixtureDir = __DIR__ . '/Fixtures';
+        $options = new MjmlOptions(
+            validationLevel: ValidationLevel::Skip,
+            ignoreIncludes: false,
+            filePath: $fixtureDir,
+        );
+        $parser = new MjmlParser(ComponentRegistry::withDefaults(), $options);
+
+        $mjml = <<<MJML
+        <mjml>
+          <mj-body>
+            <mj-section>
+              <mj-include path="../outside.mjml" />
+            </mj-section>
+          </mj-body>
+        </mjml>
+        MJML;
+
+        $node = $parser->parse($mjml, $fixtureDir . '/test.mjml');
+
+        $body = $node->children[0];
+        $section = $body->children[0];
+        // Path traversal should produce a denial comment
+        self::assertCount(1, $section->children);
+        self::assertSame('mj-raw', $section->children[0]->tagName);
+        self::assertStringContainsString('mj-include denied', $section->children[0]->content);
+    }
+
+    public function testIncludeDeniedAbsolutePath(): void
+    {
+        $fixtureDir = __DIR__ . '/Fixtures';
+        $options = new MjmlOptions(
+            validationLevel: ValidationLevel::Skip,
+            ignoreIncludes: false,
+            filePath: $fixtureDir,
+        );
+        $parser = new MjmlParser(ComponentRegistry::withDefaults(), $options);
+
+        $mjml = <<<MJML
+        <mjml>
+          <mj-body>
+            <mj-section>
+              <mj-include path="/etc/passwd" />
+            </mj-section>
+          </mj-body>
+        </mjml>
+        MJML;
+
+        $node = $parser->parse($mjml, $fixtureDir . '/test.mjml');
+
+        $body = $node->children[0];
+        $section = $body->children[0];
+        self::assertCount(1, $section->children);
+        self::assertSame('mj-raw', $section->children[0]->tagName);
+        self::assertStringContainsString('mj-include denied', $section->children[0]->content);
+    }
+
+    public function testIncludeCssType(): void
+    {
+        $fixtureDir = __DIR__ . '/Fixtures';
+        // Create a temp CSS file
+        $cssFile = $fixtureDir . '/test-include.css';
+        file_put_contents($cssFile, '.test { color: red; }');
+
+        try {
+            $options = new MjmlOptions(
+                validationLevel: ValidationLevel::Skip,
+                ignoreIncludes: false,
+                filePath: $fixtureDir,
+            );
+            $parser = new MjmlParser(ComponentRegistry::withDefaults(), $options);
+
+            $mjml = <<<MJML
+            <mjml>
+              <mj-body>
+                <mj-section>
+                  <mj-include path="test-include.css" type="css" />
+                </mj-section>
+              </mj-body>
+            </mjml>
+            MJML;
+
+            $node = $parser->parse($mjml, $fixtureDir . '/test.mjml');
+
+            // CSS include should create mj-head with mj-style child
+            $head = $node->findFirstByTag('mj-head');
+            self::assertNotNull($head);
+            self::assertCount(1, $head->children);
+            self::assertSame('mj-style', $head->children[0]->tagName);
+            self::assertStringContainsString('.test { color: red; }', $head->children[0]->content);
+        } finally {
+            @unlink($cssFile);
+        }
+    }
+
+    public function testIncludeHtmlType(): void
+    {
+        $fixtureDir = __DIR__ . '/Fixtures';
+        // Create a temp HTML file
+        $htmlFile = $fixtureDir . '/test-include.html';
+        file_put_contents($htmlFile, '<div>Custom HTML</div>');
+
+        try {
+            $options = new MjmlOptions(
+                validationLevel: ValidationLevel::Skip,
+                ignoreIncludes: false,
+                filePath: $fixtureDir,
+            );
+            $parser = new MjmlParser(ComponentRegistry::withDefaults(), $options);
+
+            $mjml = <<<MJML
+            <mjml>
+              <mj-body>
+                <mj-section>
+                  <mj-include path="test-include.html" type="html" />
+                </mj-section>
+              </mj-body>
+            </mjml>
+            MJML;
+
+            $node = $parser->parse($mjml, $fixtureDir . '/test.mjml');
+
+            $body = $node->children[0];
+            $section = $body->children[0];
+            // HTML include should become mj-raw
+            self::assertCount(1, $section->children);
+            self::assertSame('mj-raw', $section->children[0]->tagName);
+            self::assertStringContainsString('<div>Custom HTML</div>', $section->children[0]->content);
+        } finally {
+            @unlink($htmlFile);
+        }
+    }
+
+    public function testIncludeDeniedNullByte(): void
+    {
+        $fixtureDir = __DIR__ . '/Fixtures';
+        $options = new MjmlOptions(
+            validationLevel: ValidationLevel::Skip,
+            ignoreIncludes: false,
+            filePath: $fixtureDir,
+        );
+        $parser = new MjmlParser(ComponentRegistry::withDefaults(), $options);
+
+        $mjml = <<<MJML
+        <mjml>
+          <mj-body>
+            <mj-section>
+              <mj-include path="incl.mjml%00" />
+            </mj-section>
+          </mj-body>
+        </mjml>
+        MJML;
+
+        $node = $parser->parse($mjml, $fixtureDir . '/test.mjml');
+
+        $body = $node->children[0];
+        $section = $body->children[0];
+        self::assertCount(1, $section->children);
+        self::assertSame('mj-raw', $section->children[0]->tagName);
+        self::assertStringContainsString('mj-include denied', $section->children[0]->content);
+    }
+
+    public function testIncludeWithIncludePath(): void
+    {
+        $rootDir = sys_get_temp_dir() . '/mjml-include-root-' . bin2hex(random_bytes(4));
+        $extraDir = sys_get_temp_dir() . '/mjml-include-extra-' . bin2hex(random_bytes(4));
+        mkdir($rootDir);
+        mkdir($extraDir);
+        file_put_contents($extraDir . '/extra.mjml', '<mj-text>From extra dir</mj-text>');
+
+        try {
+            $relativePath = $this->relativePath($rootDir, $extraDir . '/extra.mjml');
+
+            $deniedOptions = new MjmlOptions(
+                validationLevel: ValidationLevel::Skip,
+                ignoreIncludes: false,
+                filePath: $rootDir,
+            );
+            $deniedParser = new MjmlParser(ComponentRegistry::withDefaults(), $deniedOptions);
+
+            $mjml = <<<MJML
+            <mjml>
+              <mj-body>
+                <mj-section>
+                  <mj-include path="{$relativePath}" />
+                </mj-section>
+              </mj-body>
+            </mjml>
+            MJML;
+
+            $deniedNode = $deniedParser->parse($mjml, $rootDir . '/template.mjml');
+            $deniedSection = $deniedNode->children[0]->children[0];
+            self::assertSame('mj-raw', $deniedSection->children[0]->tagName);
+            self::assertStringContainsString('mj-include denied', $deniedSection->children[0]->content);
+
+            $allowedOptions = new MjmlOptions(
+                validationLevel: ValidationLevel::Skip,
+                ignoreIncludes: false,
+                filePath: $rootDir,
+                includePath: [$extraDir],
+            );
+            $allowedParser = new MjmlParser(ComponentRegistry::withDefaults(), $allowedOptions);
+
+            $allowedNode = $allowedParser->parse($mjml, $rootDir . '/template.mjml');
+            $allowedSection = $allowedNode->children[0]->children[0];
+            self::assertCount(1, $allowedSection->children);
+            self::assertSame('mj-text', $allowedSection->children[0]->tagName);
+            self::assertSame('From extra dir', trim($allowedSection->children[0]->content));
+        } finally {
+            @unlink($extraDir . '/extra.mjml');
+            @rmdir($extraDir);
+            @rmdir($rootDir);
+        }
+    }
+
+    public function testCommentsAreKeptByDefault(): void
+    {
+        $mjml = <<<'MJML'
+        <mjml>
+          <mj-body>
+            <!-- root comment -->
+            <mj-section />
+          </mj-body>
+        </mjml>
+        MJML;
+
+        $node = $this->parser->parse($mjml);
+        $body = $node->children[0];
+
+        self::assertSame('mj-raw', $body->children[0]->tagName);
+        self::assertSame('<!-- root comment -->', $body->children[0]->content);
+    }
+
+    public function testCommentsCanBeRemoved(): void
+    {
+        $parser = new MjmlParser(ComponentRegistry::withDefaults(), new MjmlOptions(
+            validationLevel: ValidationLevel::Skip,
+            keepComments: false,
+        ));
+
+        $mjml = <<<'MJML'
+        <mjml>
+          <mj-body>
+            <!-- root comment -->
+            <mj-section />
+          </mj-body>
+        </mjml>
+        MJML;
+
+        $node = $parser->parse($mjml);
+        $body = $node->children[0];
+
+        self::assertCount(1, $body->children);
+        self::assertSame('mj-section', $body->children[0]->tagName);
+    }
+
+    private function relativePath(string $from, string $to): string
+    {
+        $from = explode(DIRECTORY_SEPARATOR, trim(realpath($from) ?: $from, DIRECTORY_SEPARATOR));
+        $to = explode(DIRECTORY_SEPARATOR, trim(realpath($to) ?: $to, DIRECTORY_SEPARATOR));
+
+        while ($from !== [] && $to !== [] && $from[0] === $to[0]) {
+            array_shift($from);
+            array_shift($to);
+        }
+
+        return str_repeat('..' . DIRECTORY_SEPARATOR, count($from)) . implode(DIRECTORY_SEPARATOR, $to);
     }
 
     public function testEmptyTagIsParsedCorrectly(): void

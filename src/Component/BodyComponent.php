@@ -54,6 +54,11 @@ abstract class BodyComponent extends AbstractComponent
 
             if ($name === 'style') {
                 $value = $this->styles($value);
+
+                // Skip empty style attributes (matching JS behavior)
+                if ($value === '') {
+                    continue;
+                }
             }
 
             $output .= " {$name}=\"{$value}\"";
@@ -260,5 +265,21 @@ abstract class BodyComponent extends AbstractComponent
         }
 
         return WidthParser::parse($width);
+    }
+
+    /**
+     * Suffix each CSS class with the given suffix.
+     * "foo bar" with suffix "outlook" becomes "foo-outlook bar-outlook".
+     */
+    protected static function suffixCssClasses(?string $classes, string $suffix): string
+    {
+        if ($classes === null || $classes === '') {
+            return '';
+        }
+
+        $parts = explode(' ', $classes);
+        $suffixed = array_map(static fn(string $c): string => "{$c}-{$suffix}", $parts);
+
+        return implode(' ', $suffixed);
     }
 }

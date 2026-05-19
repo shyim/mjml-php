@@ -98,7 +98,7 @@ final class MjGroup extends BodyComponent
             $width = (100 / max($nonRawSiblings, 1)) . '%';
         }
 
-        $parsed = WidthParser::parse($width);
+        $parsed = WidthParser::parse($width, parseFloatToInt: false);
 
         return [
             'unit' => $parsed['unit'],
@@ -130,8 +130,8 @@ final class MjGroup extends BodyComponent
         $parsed = $this->getParsedWidth();
 
         $className = match ($parsed['unit']) {
-            '%' => 'mj-column-per-' . (int) $parsed['parsedWidth'],
-            default => 'mj-column-px-' . (int) $parsed['parsedWidth'],
+            '%' => 'mj-column-per-' . str_replace('.', '-', (string) $parsed['parsedWidth']),
+            default => 'mj-column-px-' . str_replace('.', '-', (string) $parsed['parsedWidth']),
         };
 
         // Add className to media queries

@@ -16,8 +16,8 @@ final class WidthParserTest extends TestCase
     public static function widthProvider(): iterable
     {
         yield '1px' => ['1px', 1.0, 'px'];
-        yield '33.3px' => ['33.3px', 33.3, 'px'];
-        yield '33.3%' => ['33.3%', 33.3, '%'];
+        yield '33.3px' => ['33.3px', 33.0, 'px']; // parseInt truncates decimals for px
+        yield '33.3%' => ['33.3%', 33.3, '%']; // parseFloat preserves decimals for %
         yield '100%' => ['100%', 100.0, '%'];
         yield '600px' => ['600px', 600.0, 'px'];
     }
@@ -29,5 +29,12 @@ final class WidthParserTest extends TestCase
 
         self::assertSame($expectedValue, $result['value']);
         self::assertSame($expectedUnit, $result['unit']);
+    }
+
+    public function testParseFloatToIntDisabled(): void
+    {
+        $result = WidthParser::parse('33.3px', parseFloatToInt: false);
+        self::assertSame(33.3, $result['value']);
+        self::assertSame('px', $result['unit']);
     }
 }

@@ -1,0 +1,18 @@
+--OPTIONS--
+ignoreIncludes: false
+filePath: circular
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-include path="a.mjml" />
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--EXCEPTION--
+RuntimeException
+Circular inclusion detected

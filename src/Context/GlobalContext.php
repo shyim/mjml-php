@@ -14,6 +14,8 @@ final class GlobalContext
     public string $language = 'und';
     public string $dir = 'auto';
     public bool $forceOWADesktop = false;
+    public ?string $bodyId = null;
+    public ?string $bodyCssClass = null;
 
     /** @var array<string, string> Font name => URL */
     public array $fonts = [];

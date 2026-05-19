@@ -1,0 +1,270 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Shyim\Mjml\Mjml;
+use Shyim\Mjml\MjmlOptions;
+use Shyim\Mjml\Validation\ValidationException;
+use Shyim\Mjml\Validation\ValidationLevel;
+
+$autoload = $_composer_autoload_path ?? null;
+
+if ($autoload === null) {
+    foreach ([__DIR__ . '/../vendor/autoload.php', __DIR__ . '/../../../autoload.php'] as $candidate) {
+        if (is_file($candidate)) {
+            $autoload = $candidate;
+            break;
+        }
+    }
+}
+
+if ($autoload === null || !is_file($autoload)) {
+    fwrite(STDERR, "Could not locate Composer autoloader. Run composer install first.\n");
+    exit(1);
+}
+
+require $autoload;
+
+/**
+ * @return never
+ */
+function mjml_php_usage(int $exitCode = 0): never
+{
+    $stream = $exitCode === 0 ? STDOUT : STDERR;
+    fwrite($stream, <<<'USAGE'
+Usage:
+  mjml-php [input.mjml|-] [options]
+
+Options:
+  -o, --output <file>           Write HTML to file instead of stdout
+      --validation-level <lvl>  strict|skip (default: strict)
+      --skip-validation         Shortcut for --validation-level=skip
+      --file-path <path>        Base file/directory for relative includes
+      --process-includes        Process mj-include tags (default: ignored)
+      --include-path <path>     Extra allowed include root; repeatable or comma-separated
+      --lang <lang>             HTML language (default: und)
+      --dir <dir>               Text direction (default: auto)
+  -h, --help                    Show this help
+      --version                 Show package version
+
+Input defaults to stdin when omitted or set to "-".
+
+Examples:
+  mjml-php email.mjml -o email.html
+  mjml-php < email.mjml > email.html
+  mjml-php email.mjml --process-includes --include-path partials
+
+USAGE);
+    exit($exitCode);
+}
+
+/**
+ * @return never
+ */
+function mjml_php_fail(string $message, int $exitCode = 1): never
+{
+    fwrite(STDERR, $message . PHP_EOL);
+    exit($exitCode);
+}
+
+function mjml_php_version(): string
+{
+    if (class_exists(Composer\InstalledVersions::class)) {
+        $version = Composer\InstalledVersions::getPrettyVersion('shyim/mjml-php');
+        if ($version !== null) {
+            return $version;
+        }
+    }
+
+    return 'unknown';
+}
+
+/**
+ * @param list<string> $args
+ */
+function mjml_php_value(array $args, int &$index, string $option): string
+{
+    if (!isset($args[$index + 1]) || str_starts_with($args[$index + 1], '-')) {
+        mjml_php_fail("Option {$option} requires a value.");
+    }
+
+    $index++;
+
+    return $args[$index];
+}
+
+$args = $_SERVER['argv'] ?? [];
+array_shift($args);
+/** @var list<string> $args */
+$args = array_values($args);
+
+$input = null;
+$output = null;
+$validationLevel = 'strict';
+$filePath = null;
+$ignoreIncludes = true;
+$includePath = [];
+$lang = 'und';
+$dir = 'auto';
+
+for ($i = 0, $count = count($args); $i < $count; $i++) {
+    $arg = $args[$i];
+
+    if ($arg === '-h' || $arg === '--help') {
+        mjml_php_usage(0);
+    }
+
+    if ($arg === '--version') {
+        fwrite(STDOUT, 'mjml-php ' . mjml_php_version() . "\n");
+        exit(0);
+    }
+
+    if ($arg === '-o' || $arg === '--output') {
+        $output = mjml_php_value($args, $i, $arg);
+        continue;
+    }
+
+    if (str_starts_with($arg, '--output=')) {
+        $output = substr($arg, strlen('--output='));
+        continue;
+    }
+
+    if ($arg === '--validation-level' || $arg === '--validation') {
+        $validationLevel = mjml_php_value($args, $i, $arg);
+        continue;
+    }
+
+    if (str_starts_with($arg, '--validation-level=')) {
+        $validationLevel = substr($arg, strlen('--validation-level='));
+        continue;
+    }
+
+    if (str_starts_with($arg, '--validation=')) {
+        $validationLevel = substr($arg, strlen('--validation='));
+        continue;
+    }
+
+    if ($arg === '--skip-validation') {
+        $validationLevel = 'skip';
+        continue;
+    }
+
+    if ($arg === '--file-path') {
+        $filePath = mjml_php_value($args, $i, $arg);
+        continue;
+    }
+
+    if (str_starts_with($arg, '--file-path=')) {
+        $filePath = substr($arg, strlen('--file-path='));
+        continue;
+    }
+
+    if ($arg === '--process-includes') {
+        $ignoreIncludes = false;
+        continue;
+    }
+
+    if ($arg === '--ignore-includes') {
+        $ignoreIncludes = true;
+        continue;
+    }
+
+    if ($arg === '--include-path') {
+        foreach (explode(',', mjml_php_value($args, $i, $arg)) as $path) {
+            if ($path !== '') {
+                $includePath[] = $path;
+            }
+        }
+        continue;
+    }
+
+    if (str_starts_with($arg, '--include-path=')) {
+        foreach (explode(',', substr($arg, strlen('--include-path='))) as $path) {
+            if ($path !== '') {
+                $includePath[] = $path;
+            }
+        }
+        continue;
+    }
+
+    if ($arg === '--lang') {
+        $lang = mjml_php_value($args, $i, $arg);
+        continue;
+    }
+
+    if (str_starts_with($arg, '--lang=')) {
+        $lang = substr($arg, strlen('--lang='));
+        continue;
+    }
+
+    if ($arg === '--dir') {
+        $dir = mjml_php_value($args, $i, $arg);
+        continue;
+    }
+
+    if (str_starts_with($arg, '--dir=')) {
+        $dir = substr($arg, strlen('--dir='));
+        continue;
+    }
+
+    if (str_starts_with($arg, '-')) {
+        mjml_php_fail("Unknown option: {$arg}\nRun mjml-php --help for usage.");
+    }
+
+    if ($input !== null) {
+        mjml_php_fail("Unexpected extra argument: {$arg}\nRun mjml-php --help for usage.");
+    }
+
+    $input = $arg;
+}
+
+if ($input === null || $input === '-') {
+    $mjml = stream_get_contents(STDIN);
+    if ($mjml === false) {
+        mjml_php_fail('Failed to read MJML from stdin.');
+    }
+} else {
+    $mjml = file_get_contents($input);
+    if ($mjml === false) {
+        mjml_php_fail("Failed to read input file: {$input}");
+    }
+
+    $filePath ??= $input;
+}
+
+try {
+    $validation = ValidationLevel::from($validationLevel);
+} catch (ValueError) {
+    mjml_php_fail("Invalid validation level: {$validationLevel}. Expected strict or skip.");
+}
+
+try {
+    $result = Mjml::render($mjml, new MjmlOptions(
+        validationLevel: $validation,
+        language: $lang,
+        dir: $dir,
+        filePath: $filePath,
+        ignoreIncludes: $ignoreIncludes,
+        includePath: $includePath !== [] ? $includePath : null,
+    ));
+} catch (ValidationException $e) {
+    mjml_php_fail($e->getMessage());
+} catch (Throwable $e) {
+    mjml_php_fail('MJML render failed: ' . $e->getMessage());
+}
+
+if ($output !== null) {
+    $directory = dirname($output);
+    if ($directory !== '' && $directory !== '.' && !is_dir($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
+        mjml_php_fail("Failed to create output directory: {$directory}");
+    }
+
+    if (file_put_contents($output, $result->html) === false) {
+        mjml_php_fail("Failed to write output file: {$output}");
+    }
+
+    exit(0);
+}
+
+echo $result->html;

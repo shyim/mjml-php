@@ -28,7 +28,7 @@ final class MjWrapper extends MjSection
 
         return new RenderContext(
             containerWidth: $boxWidths['box'] . 'px',
-            sectionGap: $gap !== null ? (int) $gap : 0,
+            sectionGap: $gap,
             columnGap: $this->renderContext->columnGap,
         );
     }
@@ -51,6 +51,7 @@ final class MjWrapper extends MjSection
                 $tdAttrs = [
                     'align' => $component->getAttribute('align'),
                     'width' => $containerWidth,
+                    'style' => 'tdOutlook',
                 ];
                 if ($outlookClass !== '') {
                     $tdAttrs['class'] = $outlookClass;

@@ -115,7 +115,7 @@ final class MjNavbarLink extends BodyComponent
     public function render(): string
     {
         $cssClass = $this->getAttribute('css-class');
-        $outlookClass = $cssClass ? $cssClass . '-outlook' : null;
+        $outlookClass = self::suffixCssClasses($cssClass, 'outlook');
 
         return '<!--[if mso | IE]>'
             . '<td'

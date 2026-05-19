@@ -1,0 +1,18 @@
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-include path="partials/snippet.html" type="html" />
+        <mj-text>After ignored include</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+After ignored include
+
+--HTML-NOT--
+Fixture HTML include
+mj-include denied

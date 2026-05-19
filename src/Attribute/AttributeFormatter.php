@@ -30,7 +30,7 @@ final class AttributeFormatter
         return $result;
     }
 
-    private static function formatValue(string $value, string $typeString): string
+    private static function formatValue(?string $value, string $typeString): ?string
     {
         // For now, pass values through - type validation happens in the validator
         // The JS version also mostly passes values through in formatAttributes

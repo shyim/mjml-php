@@ -13,7 +13,7 @@ final class RenderContext
         public readonly int $index = 0,
         public readonly int $sibling = 0,
         public readonly int $nonRawSiblings = 0,
-        public readonly float $sectionGap = 0,
+        public readonly ?string $sectionGap = null,
         public readonly float $columnGap = 0,
     ) {}
 

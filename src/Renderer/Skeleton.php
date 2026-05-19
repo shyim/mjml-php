@@ -30,6 +30,9 @@ final class Skeleton
             ? $context->beforeDoctype . "\n"
             : '';
 
+        $bodyId = $context->bodyId !== null ? " id=\"{$context->bodyId}\"" : '';
+        $bodyCssClass = $context->bodyCssClass !== null ? " class=\"{$context->bodyCssClass}\"" : '';
+
         return <<<HTML
 {$beforeDoctype}<!doctype html>
 <html lang="{$context->language}" dir="{$context->dir}" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
@@ -95,7 +98,7 @@ final class Skeleton
     {$styleTags}
     {$headRaw}
   </head>
-  <body style="word-spacing:normal;{$backgroundStyle}">
+  <body{$bodyId}{$bodyCssClass} style="word-spacing:normal;{$backgroundStyle}">
     {$previewTag}
     {$bodyContent}
   </body>

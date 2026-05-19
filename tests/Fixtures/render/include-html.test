@@ -1,0 +1,17 @@
+--OPTIONS--
+ignoreIncludes: false
+filePath: .
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-include path="partials/snippet.html" type="html" />
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+<div id="fixture-snippet">Fixture HTML include</div>

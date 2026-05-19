@@ -1,0 +1,19 @@
+--OPTIONS--
+ignoreIncludes: false
+filePath: .
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-include path="partials/styles.css" type="css" />
+        <mj-text css-class="fixture-banner">Fixture CSS include</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+.fixture-banner { color: purple; }
+Fixture CSS include

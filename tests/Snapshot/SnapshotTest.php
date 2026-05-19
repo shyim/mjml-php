@@ -14,10 +14,10 @@ use Shyim\Mjml\Validation\ValidationLevel;
  * Snapshot tests that compare PHP rendering output against the original JS MJML CLI output.
  *
  * Reference HTML files are generated with: npx mjml <fixture>.mjml -o <fixture>.html
- * using mjml-core 4.18.0 / mjml-cli 4.18.0
+ * using mjml-core 5.2.1 / mjml-cli 5.2.1
  *
  * To regenerate reference files:
- *   for f in tests/Snapshot/Fixtures/*.mjml; do npx mjml "$f" -o "${f%.mjml}.html"; done
+ *   for f in tests/Snapshot/Fixtures/*.mjml; do npx mjml@5.2.1 "$f" --no-minify > "${f%.mjml}.html"; done
  */
 final class SnapshotTest extends TestCase
 {
@@ -81,6 +81,9 @@ final class SnapshotTest extends TestCase
         // Normalize line endings
         $html = str_replace("\r\n", "\n", $html);
 
+        // Remove <!-- FILE: ... --> comments (added by MJML CLI, not by renderer)
+        $html = preg_replace('/<!-- FILE: [^>]*-->/', '', $html);
+
         // Remove trailing whitespace on each line
         $html = preg_replace('/[ \t]+$/m', '', $html) ?? $html;
 
@@ -131,8 +134,9 @@ final class SnapshotTest extends TestCase
             $html,
         ) ?? $html;
 
-        // Remove empty class attributes (beautifier artifact from JS)
+        // Remove empty class and style attributes (beautifier artifact from JS / PHP skips them)
         $html = preg_replace('/ class=""/', '', $html) ?? $html;
+        $html = preg_replace('/ style=""/', '', $html) ?? $html;
 
         // Remove trailing space before > (beautifier artifact)
         $html = preg_replace('/\s+>/', '>', $html) ?? $html;

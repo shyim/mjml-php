@@ -24,6 +24,9 @@
             "Shyim\\Mjml\\Tests\\": "tests/"
         }
     },
+    "bin": [
+        "bin/mjml-php"
+    ],
     "config": {
         "sort-packages": true
     },

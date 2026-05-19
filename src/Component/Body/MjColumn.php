@@ -22,7 +22,7 @@ final class MjColumn extends BodyComponent
             'border' => 'string',
             'border-bottom' => 'string',
             'border-left' => 'string',
-            'border-radius' => 'unit(px,%){1,4}',
+            'border-radius' => 'string',
             'border-right' => 'string',
             'border-top' => 'string',
             'direction' => 'enum(ltr,rtl)',
@@ -34,7 +34,7 @@ final class MjColumn extends BodyComponent
             'inner-border' => 'string',
             'inner-border-bottom' => 'string',
             'inner-border-left' => 'string',
-            'inner-border-radius' => 'unit(px,%){1,4}',
+            'inner-border-radius' => 'string',
             'inner-border-right' => 'string',
             'inner-border-top' => 'string',
             'padding' => 'unit(px,%){1,4}',
@@ -153,7 +153,8 @@ final class MjColumn extends BodyComponent
         }
 
         if ($width === null) {
-            return (int) (100 / max($nonRawSiblings, 1)) . '%';
+            $val = 100 / max($nonRawSiblings, 1);
+            return rtrim(rtrim(number_format($val, 2, '.', ''), '0'), '.') . '%';
         }
 
         $parsed = WidthParser::parse($width);
@@ -162,13 +163,14 @@ final class MjColumn extends BodyComponent
             return $width;
         }
 
-        return ($parsed['value'] / max((int) ((float) $containerWidth), 1) * 100) . '%';
+        $val = $parsed['value'] / max((int) ((float) $containerWidth), 1) * 100;
+        return rtrim(rtrim(number_format($val, 2, '.', ''), '0'), '.') . '%';
     }
 
     public function getWidthAsPixel(): string
     {
         $containerWidth = $this->renderContext->containerWidth;
-        $parsed = WidthParser::parse($this->getParsedWidthString());
+        $parsed = WidthParser::parse($this->getParsedWidthString(), parseFloatToInt: false);
 
         if ($parsed['unit'] === '%') {
             return ((float) $containerWidth * $parsed['value'] / 100) . 'px';
@@ -203,7 +205,7 @@ final class MjColumn extends BodyComponent
             $width = (100 / max($nonRawSiblings, 1)) . '%';
         }
 
-        $parsed = WidthParser::parse($width);
+        $parsed = WidthParser::parse($width, parseFloatToInt: false);
 
         return [
             'unit' => $parsed['unit'],

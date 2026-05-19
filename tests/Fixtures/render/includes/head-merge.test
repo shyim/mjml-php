@@ -1,0 +1,15 @@
+--OPTIONS--
+ignoreIncludes: false
+filePath: head
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-include path="partial.mjml" />
+  </mj-body>
+</mjml>
+
+--HTML--
+<title>Included title</title>
+.included { color: red; }
+Included body

@@ -1,0 +1,15 @@
+--OPTIONS--
+ignoreIncludes: false
+filePath: nested
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-include path="outer.mjml" />
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+Nested include

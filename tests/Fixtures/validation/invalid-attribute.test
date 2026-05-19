@@ -1,0 +1,14 @@
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text invalid-attr="true">Invalid attribute</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--ERRORS--
+Attribute invalid-attr is illegal
+(mj-text)

@@ -179,7 +179,6 @@ final class MjNavbar extends BodyComponent
             . '<div'
             . $this->htmlAttributes([
                 'class' => 'mj-inline-links',
-                'style' => [],
             ])
             . '>'
             . '<!--[if mso | IE]>'

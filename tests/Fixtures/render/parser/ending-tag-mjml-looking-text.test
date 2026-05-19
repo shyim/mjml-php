@@ -1,0 +1,13 @@
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text>This should stay literal: <mj-section><mj-column></mj-column></mj-section></mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+This should stay literal: <mj-section><mj-column></mj-column></mj-section>
