@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component;
+namespace Mjml\Component;
 
-use Shyim\Mjml\Context\RenderContext;
-use Shyim\Mjml\Helper\CssParser;
-use Shyim\Mjml\Helper\WidthParser;
-use Shyim\Mjml\Parser\Node;
+use Mjml\Context\RenderContext;
+use Mjml\Helper\CssParser;
+use Mjml\Helper\UrlSanitizer;
+use Mjml\Helper\WidthParser;
+use Mjml\Parser\Node;
 
 abstract class BodyComponent extends AbstractComponent
 {
@@ -45,7 +46,7 @@ abstract class BodyComponent extends AbstractComponent
      */
     protected function htmlAttributes(array $attributes): string
     {
-        $output = '';
+        $parts = [];
 
         foreach ($attributes as $name => $value) {
             if ($value === null) {
@@ -59,12 +60,20 @@ abstract class BodyComponent extends AbstractComponent
                 if ($value === '') {
                     continue;
                 }
+            } else {
+                if (!\is_string($value)) {
+                    // Non-style attributes must be scalar strings
+                    continue;
+                }
+                if (UrlSanitizer::isUrlAttribute($name)) {
+                    $value = UrlSanitizer::sanitize($value);
+                }
             }
 
-            $output .= " {$name}=\"{$value}\"";
+            $parts[] = "{$name}=\"{$value}\"";
         }
 
-        return $output;
+        return $parts === [] ? '' : ' ' . implode(' ', $parts);
     }
 
     /**
@@ -80,14 +89,14 @@ abstract class BodyComponent extends AbstractComponent
             $stylesArray = $styles;
         }
 
-        $output = '';
+        $parts = [];
         foreach ($stylesArray as $name => $value) {
             if ($value !== null && $value !== '') {
-                $output .= "{$name}:{$value};";
+                $parts[] = "{$name}:{$value};";
             }
         }
 
-        return $output;
+        return implode('', $parts);
     }
 
     /**
@@ -236,10 +245,11 @@ abstract class BodyComponent extends AbstractComponent
 
         foreach ($children as $child) {
             $attrs = array_merge($attributes, $child->attributes);
-            $attrStr = '';
+            $attrParts = [];
             foreach ($attrs as $name => $value) {
-                $attrStr .= " {$name}=\"{$value}\"";
+                $attrParts[] = "{$name}=\"{$value}\"";
             }
+            $attrStr = $attrParts === [] ? '' : ' ' . implode(' ', $attrParts);
 
             if ($child->children === [] && $child->content === '') {
                 $output .= "<{$child->tagName}{$attrStr} />\n";

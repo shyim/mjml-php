@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Tests\Unit\Cli;
+namespace Mjml\Tests\Unit\Cli;
 
 use PHPUnit\Framework\TestCase;
 

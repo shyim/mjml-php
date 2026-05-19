@@ -1,0 +1,22 @@
+--OPTIONS--
+beautify: true
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text>{% for item in items %}{{ item }}{% endfor %}</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+{% for item in items %}
+{{ item }}
+{% endfor %}
+
+--HTML-NOT--
+{% for item in items % }
+{ % for item in items %}

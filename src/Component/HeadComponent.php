@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component;
+namespace Mjml\Component;
 
 abstract class HeadComponent extends AbstractComponent
 {

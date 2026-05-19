@@ -1,0 +1,19 @@
+--OPTIONS--
+validationLevel: skip
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-raw test="test"><?php endif ?></mj-raw>
+        <mj-raw>
+          <?php endif ?>
+        </mj-raw>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+<?php endif ?>

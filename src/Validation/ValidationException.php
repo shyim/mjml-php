@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Validation;
+namespace Mjml\Validation;
 
-final class ValidationException extends \RuntimeException
+use Mjml\MjmlException;
+
+final class ValidationException extends MjmlException
 {
     /**
      * @param list<ValidationError> $errors

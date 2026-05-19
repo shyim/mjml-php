@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Head;
+namespace Mjml\Component\Head;
 
-use Shyim\Mjml\Component\HeadComponent;
+use Mjml\Component\HeadComponent;
 
 final class MjHeadHtmlAttributes extends HeadComponent
 {
@@ -52,10 +52,7 @@ final class MjHeadHtmlAttributes extends HeadComponent
                 $custom[$name] = trim($child->content);
             }
 
-            $this->globalContext->htmlAttributes[$path] = array_merge(
-                $this->globalContext->htmlAttributes[$path] ?? [],
-                $custom,
-            );
+            $this->globalContext->mergeHtmlAttributes($path, $custom);
         }
     }
 }

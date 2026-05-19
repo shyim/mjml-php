@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Tests\Unit\Helper;
+namespace Mjml\Tests\Unit\Helper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Shyim\Mjml\Helper\CssParser;
+use Mjml\Helper\CssParser;
 
 final class CssParserTest extends TestCase
 {

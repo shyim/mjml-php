@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Body;
+namespace Mjml\Component\Body;
 
-use Shyim\Mjml\Component\BodyComponent;
-use Shyim\Mjml\Helper\WidthParser;
+use Mjml\Component\BodyComponent;
+use Mjml\Helper\WidthParser;
 
 final class MjImage extends BodyComponent
 {
@@ -149,7 +149,7 @@ final class MjImage extends BodyComponent
 
     public function getHeadStyle(): string
     {
-        $breakpoint = $this->globalContext->breakpoint;
+        $breakpoint = $this->globalContext->getBreakpoint();
 
         // makeLowerBreakpoint: subtract 1 from breakpoint pixels
         $lowerBreakpoint = $breakpoint;

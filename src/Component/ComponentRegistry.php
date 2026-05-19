@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component;
+namespace Mjml\Component;
 
 final class ComponentRegistry
 {
@@ -107,39 +107,39 @@ final class ComponentRegistry
         $registry = new self();
 
         // Head components
-        $registry->register(\Shyim\Mjml\Component\Head\MjHead::class);
-        $registry->register(\Shyim\Mjml\Component\Head\MjHeadTitle::class);
-        $registry->register(\Shyim\Mjml\Component\Head\MjHeadPreview::class);
-        $registry->register(\Shyim\Mjml\Component\Head\MjHeadFont::class);
-        $registry->register(\Shyim\Mjml\Component\Head\MjHeadStyle::class);
-        $registry->register(\Shyim\Mjml\Component\Head\MjHeadBreakpoint::class);
-        $registry->register(\Shyim\Mjml\Component\Head\MjHeadAttributes::class);
-        $registry->register(\Shyim\Mjml\Component\Head\MjHeadHtmlAttributes::class);
+        $registry->register(\Mjml\Component\Head\MjHead::class);
+        $registry->register(\Mjml\Component\Head\MjHeadTitle::class);
+        $registry->register(\Mjml\Component\Head\MjHeadPreview::class);
+        $registry->register(\Mjml\Component\Head\MjHeadFont::class);
+        $registry->register(\Mjml\Component\Head\MjHeadStyle::class);
+        $registry->register(\Mjml\Component\Head\MjHeadBreakpoint::class);
+        $registry->register(\Mjml\Component\Head\MjHeadAttributes::class);
+        $registry->register(\Mjml\Component\Head\MjHeadHtmlAttributes::class);
 
         // Body components
-        $registry->register(\Shyim\Mjml\Component\Body\MjBody::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjSection::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjColumn::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjWrapper::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjGroup::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjText::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjImage::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjButton::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjDivider::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjSpacer::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjTable::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjRaw::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjHero::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjCarousel::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjCarouselImage::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjAccordion::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjAccordionElement::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjAccordionTitle::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjAccordionText::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjNavbar::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjNavbarLink::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjSocial::class);
-        $registry->register(\Shyim\Mjml\Component\Body\MjSocialElement::class);
+        $registry->register(\Mjml\Component\Body\MjBody::class);
+        $registry->register(\Mjml\Component\Body\MjSection::class);
+        $registry->register(\Mjml\Component\Body\MjColumn::class);
+        $registry->register(\Mjml\Component\Body\MjWrapper::class);
+        $registry->register(\Mjml\Component\Body\MjGroup::class);
+        $registry->register(\Mjml\Component\Body\MjText::class);
+        $registry->register(\Mjml\Component\Body\MjImage::class);
+        $registry->register(\Mjml\Component\Body\MjButton::class);
+        $registry->register(\Mjml\Component\Body\MjDivider::class);
+        $registry->register(\Mjml\Component\Body\MjSpacer::class);
+        $registry->register(\Mjml\Component\Body\MjTable::class);
+        $registry->register(\Mjml\Component\Body\MjRaw::class);
+        $registry->register(\Mjml\Component\Body\MjHero::class);
+        $registry->register(\Mjml\Component\Body\MjCarousel::class);
+        $registry->register(\Mjml\Component\Body\MjCarouselImage::class);
+        $registry->register(\Mjml\Component\Body\MjAccordion::class);
+        $registry->register(\Mjml\Component\Body\MjAccordionElement::class);
+        $registry->register(\Mjml\Component\Body\MjAccordionTitle::class);
+        $registry->register(\Mjml\Component\Body\MjAccordionText::class);
+        $registry->register(\Mjml\Component\Body\MjNavbar::class);
+        $registry->register(\Mjml\Component\Body\MjNavbarLink::class);
+        $registry->register(\Mjml\Component\Body\MjSocial::class);
+        $registry->register(\Mjml\Component\Body\MjSocialElement::class);
 
         // Dependencies (parent → allowed children)
         $registry->setDependencies([

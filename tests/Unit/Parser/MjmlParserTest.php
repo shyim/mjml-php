@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Tests\Unit\Parser;
+namespace Mjml\Tests\Unit\Parser;
 
 use PHPUnit\Framework\TestCase;
-use Shyim\Mjml\Component\ComponentRegistry;
-use Shyim\Mjml\MjmlOptions;
-use Shyim\Mjml\Parser\MjmlParser;
-use Shyim\Mjml\Validation\ValidationLevel;
+use Mjml\Component\ComponentRegistry;
+use Mjml\MjmlOptions;
+use Mjml\Parser\MjmlParser;
+use Mjml\Validation\ValidationLevel;
 
 final class MjmlParserTest extends TestCase
 {
@@ -676,6 +676,137 @@ final class MjmlParserTest extends TestCase
         }
 
         return str_repeat('..' . DIRECTORY_SEPARATOR, count($from)) . implode(DIRECTORY_SEPARATOR, $to);
+    }
+
+    public function testNestedSameNameEndingTagsAreNotMisPaired(): void
+    {
+        // mj-text inside another mj-text used to confuse the regex extractor
+        // by stopping at the first </mj-text>.
+        $mjml = <<<'MJML'
+        <mjml>
+          <mj-body>
+            <mj-section>
+              <mj-column>
+                <mj-text>Outer <span>before</span><mj-text>NestedInner</mj-text> tail</mj-text>
+              </mj-column>
+            </mj-section>
+          </mj-body>
+        </mjml>
+        MJML;
+
+        $node = $this->parser->parse($mjml);
+        $body = $node->children[0];
+        $section = $body->children[0];
+        $column = $section->children[0];
+
+        self::assertCount(1, $column->children);
+
+        $text = $column->children[0];
+        self::assertSame('mj-text', $text->tagName);
+        // The outer tag must capture the full inner content including the nested mj-text
+        self::assertStringContainsString('Outer', $text->content);
+        self::assertStringContainsString('NestedInner', $text->content);
+        self::assertStringContainsString('tail', $text->content);
+    }
+
+    public function testGreaterThanInsideAttributeValueIsRespected(): void
+    {
+        // The opening-tag scanner must respect quoted attribute values
+        // when locating the end of <mj-text ...>.
+        $mjml = <<<'MJML'
+        <mjml>
+          <mj-body>
+            <mj-section>
+              <mj-column>
+                <mj-text>Hello <a title="if x > 0">link</a> world</mj-text>
+              </mj-column>
+            </mj-section>
+          </mj-body>
+        </mjml>
+        MJML;
+
+        $node = $this->parser->parse($mjml);
+        $text = $node->children[0]->children[0]->children[0]->children[0];
+
+        self::assertSame('mj-text', $text->tagName);
+        self::assertStringContainsString('link', $text->content);
+        self::assertStringContainsString('Hello', $text->content);
+    }
+
+    public function testOutlookConditionalCommentInsideEndingTag(): void
+    {
+        $mjml = <<<'MJML'
+        <mjml>
+          <mj-body>
+            <mj-section>
+              <mj-column>
+                <mj-text><!--[if mso]>outlook only<![endif]-->Hello</mj-text>
+              </mj-column>
+            </mj-section>
+          </mj-body>
+        </mjml>
+        MJML;
+
+        $node = $this->parser->parse($mjml);
+        $text = $node->children[0]->children[0]->children[0]->children[0];
+
+        self::assertSame('mj-text', $text->tagName);
+        self::assertStringContainsString('outlook only', $text->content);
+        self::assertStringContainsString('Hello', $text->content);
+    }
+
+    public function testEmptyInputProducesEmptyMjmlNode(): void
+    {
+        $node = $this->parser->parse('');
+        self::assertSame('mjml', $node->tagName);
+        self::assertSame([], $node->children);
+    }
+
+    public function testWhitespaceOnlyInputProducesEmptyMjmlNode(): void
+    {
+        $node = $this->parser->parse("   \n\t  ");
+        self::assertSame('mjml', $node->tagName);
+        self::assertSame([], $node->children);
+    }
+
+    public function testDeeplyNestedSectionsDoNotCrash(): void
+    {
+        // 50 nested wrappers — well below libxml limits but still non-trivial
+        $inner = '<mj-text>deep</mj-text>';
+        for ($i = 0; $i < 50; $i++) {
+            $inner = "<mj-wrapper><mj-section><mj-column>{$inner}</mj-column></mj-section></mj-wrapper>";
+        }
+        $mjml = "<mjml><mj-body>{$inner}</mj-body></mjml>";
+
+        $node = $this->parser->parse($mjml);
+        self::assertSame('mjml', $node->tagName);
+        // Walk to leaf
+        $current = $node->children[0];
+        while ($current->children !== [] && $current->children[0]->tagName !== 'mj-text') {
+            $current = $current->children[0];
+        }
+        self::assertSame('mj-text', $current->children[0]->tagName);
+    }
+
+    public function testLongAttributeValuePreserved(): void
+    {
+        $longValue = str_repeat('a', 10000);
+        $mjml = <<<MJML
+        <mjml>
+          <mj-body>
+            <mj-section>
+              <mj-column>
+                <mj-text data-x="{$longValue}">x</mj-text>
+              </mj-column>
+            </mj-section>
+          </mj-body>
+        </mjml>
+        MJML;
+
+        $node = $this->parser->parse($mjml);
+        $text = $node->children[0]->children[0]->children[0]->children[0];
+
+        self::assertSame($longValue, $text->attributes['data-x']);
     }
 
     public function testEmptyTagIsParsedCorrectly(): void

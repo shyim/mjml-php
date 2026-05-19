@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Tests\Unit\Helper;
+namespace Mjml\Tests\Unit\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Shyim\Mjml\Helper\JsonToXml;
-use Shyim\Mjml\Parser\Node;
+use Mjml\Helper\JsonToXml;
+use Mjml\Parser\Node;
 
 final class JsonToXmlTest extends TestCase
 {

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Tests\Snapshot;
+namespace Mjml\Tests\Snapshot;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Shyim\Mjml\Mjml;
-use Shyim\Mjml\MjmlOptions;
-use Shyim\Mjml\Validation\ValidationLevel;
+use Mjml\Mjml;
+use Mjml\MjmlOptions;
+use Mjml\Validation\ValidationLevel;
 
 /**
  * Snapshot tests that compare PHP rendering output against the original JS MJML CLI output.

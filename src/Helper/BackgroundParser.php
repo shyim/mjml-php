@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Helper;
+namespace Mjml\Helper;
 
 final class BackgroundParser
 {
@@ -84,9 +84,8 @@ final class BackgroundParser
             $isX = $coordinate === 'x';
             $pos = $isX ? $bgPosX : $bgPosY;
 
-            if (self::isPercentage($pos)) {
-                preg_match('/^(\d+(\.\d+)?)%$/', $pos, $matches);
-                $decimal = (int) $matches[1] / 100;
+            if (self::isPercentage($pos) && preg_match('/^(\d+(\.\d+)?)%$/', $pos, $matches) === 1) {
+                $decimal = (float) $matches[1] / 100;
 
                 if ($bgRepeat) {
                     $origin = (string) $decimal;

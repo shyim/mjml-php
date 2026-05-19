@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Validation\Rule;
+namespace Mjml\Validation\Rule;
 
-use Shyim\Mjml\Component\ComponentRegistry;
-use Shyim\Mjml\Parser\Node;
-use Shyim\Mjml\Validation\ValidationError;
+use Mjml\Component\ComponentRegistry;
+use Mjml\Parser\Node;
+use Mjml\Validation\ValidationError;
 
 /**
  * Checks that all attributes on a component are in its allowedAttributes().

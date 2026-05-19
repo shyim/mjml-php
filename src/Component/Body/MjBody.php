@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Body;
+namespace Mjml\Component\Body;
 
-use Shyim\Mjml\Component\BodyComponent;
-use Shyim\Mjml\Context\RenderContext;
+use Mjml\Component\BodyComponent;
+use Mjml\Context\RenderContext;
 
 final class MjBody extends BodyComponent
 {
@@ -51,22 +51,22 @@ final class MjBody extends BodyComponent
     {
         $bgColor = $this->getAttribute('background-color');
         if ($bgColor !== null) {
-            $this->globalContext->backgroundColor = $bgColor;
+            $this->globalContext->setBackgroundColor($bgColor);
         }
 
         $bodyId = $this->getAttribute('id');
         if ($bodyId !== null) {
-            $this->globalContext->bodyId = $bodyId;
+            $this->globalContext->setBodyId($bodyId);
         }
 
         $bodyCssClass = $this->getAttribute('css-class');
         if ($bodyCssClass !== null) {
-            $this->globalContext->bodyCssClass = $bodyCssClass;
+            $this->globalContext->setBodyCssClass($bodyCssClass);
         }
 
-        $title = $this->globalContext->title;
-        $lang = $this->globalContext->language;
-        $dir = $this->globalContext->dir;
+        $title = $this->globalContext->getTitle();
+        $lang = $this->globalContext->getLanguage();
+        $dir = $this->globalContext->getDir();
 
         // Inner <div>
         $divAttrs = [];

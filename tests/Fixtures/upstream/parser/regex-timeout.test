@@ -1,0 +1,16 @@
+--OPTIONS--
+validationLevel: skip
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-text font-family="Arial" />
+      <mj-column background-color="#ffffff" css-class="column1"></mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+column1
+background-color:#ffffff;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Tests\Fixture;
+namespace Mjml\Tests\Fixture;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Shyim\Mjml\Mjml;
-use Shyim\Mjml\Validation\ValidationException;
+use Mjml\Mjml;
+use Mjml\Validation\ValidationException;
 
 final class FixtureTest extends TestCase
 {

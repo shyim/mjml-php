@@ -1,0 +1,23 @@
+--OPTIONS--
+beautify: true
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-raw>
+          <div id="beautify-print-width-probe" data-alpha="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" data-beta="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb" data-gamma="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc" data-delta="dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd">Wrapped raw tag</div>
+        </mj-raw>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+id="beautify-print-width-probe"
+data-alpha="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+data-beta="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+data-gamma="cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+data-delta="dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+Wrapped raw tag

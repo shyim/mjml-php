@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Tests\Integration;
+namespace Mjml\Tests\Integration;
 
 final class TableCellspacingTest extends AbstractIntegrationTest
 {

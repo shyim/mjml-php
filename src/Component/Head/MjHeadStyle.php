@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Head;
+namespace Mjml\Component\Head;
 
-use Shyim\Mjml\Component\HeadComponent;
+use Mjml\Component\HeadComponent;
 
 final class MjHeadStyle extends HeadComponent
 {
@@ -35,9 +35,9 @@ final class MjHeadStyle extends HeadComponent
         $content = $this->getContent();
 
         if ($this->getAttribute('inline') === 'inline') {
-            $this->globalContext->inlineStyles[] = $content;
+            $this->globalContext->addInlineStyle($content);
         } else {
-            $this->globalContext->styles[] = $content;
+            $this->globalContext->addStyle($content);
         }
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Helper;
+namespace Mjml\Helper;
 
 final class Fonts
 {
@@ -23,6 +23,13 @@ final class Fonts
         $toImport = [];
 
         foreach ($fonts as $name => $url) {
+            // Drop fonts loaded over disallowed URL schemes; emitting them
+            // into <link href> would let a malicious mj-font tag land
+            // javascript:/file:/etc. content in the document head.
+            if (!self::isAllowedFontUrl($url)) {
+                continue;
+            }
+
             // Check if font is used in the content or inline styles
             $needle = $name;
 
@@ -60,5 +67,30 @@ final class Fonts
       </style>
     <!--<![endif]-->
 HTML;
+    }
+
+    /**
+     * Font stylesheets are only loaded from http(s) or protocol-relative URLs.
+     * Anything else (javascript:, data:, file:, …) is silently dropped.
+     */
+    private static function isAllowedFontUrl(string $url): bool
+    {
+        $trimmed = ltrim($url);
+
+        if ($trimmed === '') {
+            return false;
+        }
+
+        if (str_starts_with($trimmed, '//')) {
+            return true;
+        }
+
+        if (!preg_match('/^([a-zA-Z][a-zA-Z0-9+.\-]*):/', $trimmed, $m)) {
+            return false; // Relative URL — almost never what a font tag wants
+        }
+
+        $scheme = strtolower($m[1]);
+
+        return $scheme === 'http' || $scheme === 'https';
     }
 }

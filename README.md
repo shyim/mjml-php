@@ -21,7 +21,7 @@ composer require shyim/mjml-php
 ### Basic
 
 ```php
-use Shyim\Mjml\Mjml;
+use Mjml\Mjml;
 
 $result = Mjml::render('<mjml>
   <mj-body>
@@ -39,8 +39,8 @@ echo $result->html;
 ### With Options
 
 ```php
-use Shyim\Mjml\Mjml;
-use Shyim\Mjml\MjmlOptions;
+use Mjml\Mjml;
+use Mjml\MjmlOptions;
 
 $result = Mjml::render($mjml, new MjmlOptions(
     keepComments: true,
@@ -56,7 +56,7 @@ echo $result->html;
 ### Custom Components
 
 ```php
-use Shyim\Mjml\Mjml;
+use Mjml\Mjml;
 
 $mjml = new Mjml();
 $mjml->registerComponent(MyCustomComponent::class);
@@ -121,8 +121,8 @@ Run `vendor/bin/mjml-php --help` for all options.
 MJML-PHP validates your markup and throws a `ValidationException` on errors:
 
 ```php
-use Shyim\Mjml\Validation\ValidationException;
-use Shyim\Mjml\Validation\ValidationLevel;
+use Mjml\Validation\ValidationException;
+use Mjml\Validation\ValidationLevel;
 
 try {
     $result = Mjml::render($mjml);
@@ -136,19 +136,62 @@ try {
 ```
 
 - **Strict** (default) — Validate and throw `ValidationException` on errors
+- **Soft** — Validate but do not throw; errors are exposed via `$result->errors`
 - **Skip** — No validation
-
-To disable validation:
 
 ```php
 $result = Mjml::render($mjml, new MjmlOptions(
-    validationLevel: ValidationLevel::Skip,
+    validationLevel: ValidationLevel::Soft,
 ));
+
+foreach ($result->errors as $error) {
+    error_log((string) $error);
+}
 ```
+
+## Exception Model
+
+All library exceptions extend `Mjml\MjmlException`, so you can catch them with a single `catch`:
+
+```php
+use Mjml\MjmlException;
+use Mjml\Parser\ParseException;
+use Mjml\Validation\ValidationException;
+
+try {
+    $result = Mjml::render($mjml);
+} catch (ValidationException $e) {
+    // Markup-level validation failures
+} catch (ParseException $e) {
+    // Circular includes, broken mj-include references, etc.
+} catch (MjmlException $e) {
+    // Any other library failure
+}
+```
+
+`MjmlException` extends `\RuntimeException`, so existing `catch (\RuntimeException $e)` blocks still work.
+
+## Security
+
+**Input is trusted.** MJML markup is treated as a template authored by you, not as end-user input. Do not concatenate untrusted strings into MJML markup — attribute values flow into the rendered HTML without HTML-escaping, the same as the official JS MJML.
+
+Defensive measures the renderer already applies:
+
+- URL attributes (`href`, `src`, `background`, `action`, `formaction`, `poster`) pass through a scheme allowlist. `javascript:`, `vbscript:`, `file:`, and similar are rewritten to `#`. Only `http`, `https`, `mailto`, `tel`, `sms`, `ftp`, `cid`, anchor fragments, protocol-relative URLs, and relative paths pass through. `data:image/*` is allowed for inline images.
+- `mj-font` URLs that are not `http`/`https`/protocol-relative are dropped instead of being emitted into `<link>` / `@import`.
+- `mj-include` is **disabled by default** (unlike the JS MJML CLI). When enabled (`ignoreIncludes: false`), included paths are jailed under the current file's directory plus any explicit `includePath` roots, with `realpath` resolution, null-byte / URL-encoded-traversal rejection, and circular-include detection.
+- libxml is invoked with `LIBXML_NONET` (no network access). Under PHP 8 / libxml ≥ 2.9, external entities are not resolved by default, so this parser is not vulnerable to XXE.
+
+If you must interpolate user data into MJML, escape it yourself before passing it to the renderer (`htmlspecialchars` for text content; URL-encode parameters you put into `href` query strings).
 
 ## MJML Compatibility
 
-This is a native PHP port aligned with MJML 5.2.1. The HTML output is tested against the original JavaScript implementation using snapshot tests to ensure identical rendering.
+This is a native PHP port aligned with MJML 5.2.1. The HTML output is tested against the original JavaScript implementation using snapshot tests to ensure identical rendering. A CI job re-renders the snapshot fixtures with `mjml@5.2.1` and fails on drift, so if the upstream JS package publishes a patch you may see CI failures — open an issue and regenerate the fixtures.
+
+## Limitations
+
+- **CSS `@import` inlining**: The CSS inliner does not resolve `@import` directives found in inline style blocks. This matches the behavior of the JS MJML reference implementation for email-safe output.
+- **CSS shorthand parsing**: Only `padding`, `margin`, and `border` shorthands are fully supported for width calculation. More exotic shorthand properties (e.g., `border-radius` with `/` syntax) are passed through as-is.
 
 ## Development
 
@@ -192,7 +235,7 @@ Unexpected raw multi-line HTML fragment
 Expected validation error fragment
 
 --EXCEPTION--
-RuntimeException
+Mjml\Parser\ParseException
 Expected exception message fragment
 ```
 

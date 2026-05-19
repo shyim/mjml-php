@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Context;
+namespace Mjml\Context;
 
 final class RenderContext
 {

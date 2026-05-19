@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Tests\Integration\Component;
+namespace Mjml\Tests\Integration\Component;
 
-use Shyim\Mjml\Tests\Integration\AbstractIntegrationTest;
+use Mjml\Tests\Integration\AbstractIntegrationTest;
 
 final class MjRawTest extends AbstractIntegrationTest
 {

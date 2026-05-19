@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Body;
+namespace Mjml\Component\Body;
 
-use Shyim\Mjml\Component\BodyComponent;
+use Mjml\Component\BodyComponent;
 
 final class MjAccordionElement extends BodyComponent
 {
@@ -112,7 +112,7 @@ final class MjAccordionElement extends BodyComponent
      */
     private function createChildComponent(string $componentClass, array $attributes): BodyComponent
     {
-        $node = new \Shyim\Mjml\Parser\Node(
+        $node = new \Mjml\Parser\Node(
             tagName: $componentClass::getComponentName(),
             attributes: $attributes,
         );

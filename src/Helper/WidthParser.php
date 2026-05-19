@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Helper;
+namespace Mjml\Helper;
 
 final class WidthParser
 {

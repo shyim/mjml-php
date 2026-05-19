@@ -2,55 +2,86 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Renderer;
+namespace Mjml\Renderer;
 
-use Shyim\Mjml\Component\BodyComponent;
-use Shyim\Mjml\Component\ComponentRegistry;
-use Shyim\Mjml\Component\HeadComponent;
-use Shyim\Mjml\Context\GlobalContext;
-use Shyim\Mjml\Context\RenderContext;
-use Shyim\Mjml\MjmlOptions;
-use Shyim\Mjml\MjmlResult;
-use Shyim\Mjml\Parser\MjmlParser;
-use Shyim\Mjml\Parser\Node;
-use Shyim\Mjml\Renderer\PostProcessor\CssInliner;
-use Shyim\Mjml\Renderer\PostProcessor\HtmlAttributeApplier;
-use Shyim\Mjml\Renderer\PostProcessor\OutlookConditionalMerger;
-use Shyim\Mjml\Validation\ValidationException;
-use Shyim\Mjml\Validation\ValidationLevel;
-use Shyim\Mjml\Validation\Validator;
+use Mjml\Cache\ArrayCache;
+use Mjml\Cache\NodeCacheInterface;
+use Mjml\Component\BodyComponent;
+use Mjml\Component\ComponentRegistry;
+use Mjml\Component\HeadComponent;
+use Mjml\Context\GlobalContext;
+use Mjml\Context\RenderContext;
+use Mjml\MjmlOptions;
+use Mjml\MjmlResult;
+use Mjml\Parser\MjmlParser;
+use Mjml\Parser\Node;
+use Mjml\Renderer\PostProcessor\CssInliner;
+use Mjml\Renderer\PostProcessor\HtmlAttributeApplier;
+use Mjml\Renderer\PostProcessor\OutlookConditionalMerger;
+use Mjml\Validation\ValidationException;
+use Mjml\Validation\ValidationLevel;
+use Mjml\Validation\Validator;
+use Mjml\Hook\PipelineHooks;
 
 final class RenderingPipeline
 {
     public function __construct(
         private readonly ComponentRegistry $registry,
         private readonly MjmlOptions $options,
+        private readonly ?NodeCacheInterface $cache = null,
+        /** @var list<PipelineHooks> */
+        private readonly array $hooks = [],
     ) {}
 
+    /**
+     * @throws \Mjml\Parser\ParseException
+     * @throws \Mjml\Validation\ValidationException
+     */
     public function execute(string $mjml): MjmlResult
     {
-        // 1. Parse MJML string to Node tree
-        $parser = new MjmlParser($this->registry, $this->options);
-        $root = $parser->parse($mjml, $this->options->filePath);
+        // 0. Before-parse hooks
+        foreach ($this->hooks as $hook) {
+            $mjml = $hook->beforeParse($mjml);
+        }
+
+        // 1. Parse MJML string to Node tree (with optional caching)
+        $cacheKey = $this->cache !== null ? ArrayCache::hashKey($mjml) : null;
+        $root = null;
+
+        if ($cacheKey !== null) {
+            $root = $this->cache->get($cacheKey);
+        }
+
+        if ($root === null) {
+            $parser = new MjmlParser($this->registry, $this->options);
+            $root = $parser->parse($mjml, $this->options->filePath);
+
+            if ($cacheKey !== null) {
+                $this->cache->set($cacheKey, $root);
+            }
+        }
+
+        // After-parse hooks
+        foreach ($this->hooks as $hook) {
+            $root = $hook->afterParse($root);
+        }
 
         // 2. Validate (if not Skip)
+        $validationErrors = [];
         if ($this->options->validationLevel !== ValidationLevel::Skip) {
             $validator = new Validator($this->registry);
-            $errors = $validator->validate($root);
+            $validationErrors = $validator->validate($root);
 
-            if ($errors !== []) {
-                throw new ValidationException($errors);
+            if ($validationErrors !== [] && $this->options->validationLevel === ValidationLevel::Strict) {
+                throw new ValidationException($validationErrors);
             }
         }
 
         // 3. Initialize global context
         $globalContext = new GlobalContext();
-        $globalContext->breakpoint = $this->options->language !== 'und'
-            ? $globalContext->breakpoint
-            : $globalContext->breakpoint;
-        $globalContext->language = $this->options->language;
-        $globalContext->dir = $this->options->dir;
-        $globalContext->fonts = $this->options->fonts;
+        $globalContext->setLanguage($this->options->language);
+        $globalContext->setDir($this->options->dir);
+        $globalContext->setFonts($this->options->fonts);
 
         // 4. Find mj-head and mj-body nodes
         $headNode = $root->findFirstByTag('mj-head');
@@ -61,12 +92,12 @@ final class RenderingPipeline
             $this->processHead($headNode, $globalContext);
         }
 
-        // 6. Apply attribute defaults to body tree
-        if ($bodyNode !== null) {
-            $this->applyAttributes($bodyNode, $globalContext);
+        // After-head-processed hooks
+        foreach ($this->hooks as $hook) {
+            $hook->afterHeadProcessed($globalContext);
         }
 
-        // 7. Render mj-body
+        // 6. Render mj-body
         $bodyContent = '';
         $rawBeforeDoctype = '';
 
@@ -87,29 +118,38 @@ final class RenderingPipeline
             $bodyContent = $this->renderBody($bodyNode, $globalContext);
         }
 
-        $globalContext->beforeDoctype = $rawBeforeDoctype;
+        $globalContext->setBeforeDoctype($rawBeforeDoctype);
 
         // Get background color from body
         if ($bodyNode !== null) {
-            $globalContext->backgroundColor = $bodyNode->attributes['background-color'] ?? '';
+            $globalContext->setBackgroundColor($bodyNode->attributes['background-color'] ?? '');
         }
 
         // 8. Apply HTML attributes via post-processing
-        if ($globalContext->htmlAttributes !== []) {
-            $bodyContent = HtmlAttributeApplier::apply($bodyContent, $globalContext->htmlAttributes);
+        $htmlAttributes = $globalContext->getHtmlAttributes();
+        if ($htmlAttributes !== []) {
+            $bodyContent = HtmlAttributeApplier::apply($bodyContent, $htmlAttributes);
         }
 
         // 9. Wrap in HTML skeleton
         $skeleton = new Skeleton();
         $html = $skeleton->build($bodyContent, $globalContext, $this->options);
 
-        // 10. Inline CSS (only explicit inline styles, not <style> tag contents)
-        if ($globalContext->inlineStyles !== []) {
-            $html = CssInliner::inline($html, $globalContext->inlineStyles);
+        // After-body-rendered hooks
+        foreach ($this->hooks as $hook) {
+            $html = $hook->afterBodyRendered($html);
         }
 
-        // 11. Merge Outlook conditionals
-        $html = OutlookConditionalMerger::merge($html);
+        // 10. Inline CSS (only explicit inline styles, not <style> tag contents)
+        $inlineStyles = $globalContext->getInlineStyles();
+        if ($inlineStyles !== []) {
+            $html = CssInliner::inline($html, $inlineStyles);
+        }
+
+        // 11. Merge Outlook conditionals (skip when the output contains none)
+        if (str_contains($html, '<!--[if')) {
+            $html = OutlookConditionalMerger::merge($html);
+        }
 
         // 12. Clean up extra whitespace in output
         $html = $this->cleanOutput($html);
@@ -120,7 +160,12 @@ final class RenderingPipeline
             $html = $this->beautifyOutput($html);
         }
 
-        return new MjmlResult(html: $html, json: $root);
+        // After-post-process hooks
+        foreach ($this->hooks as $hook) {
+            $html = $hook->afterPostProcess($html);
+        }
+
+        return new MjmlResult(html: $html, ast: $root, errors: $validationErrors);
     }
 
     private function processHead(Node $headNode, GlobalContext $globalContext): void
@@ -144,16 +189,6 @@ final class RenderingPipeline
             if ($component instanceof HeadComponent) {
                 $component->handler();
             }
-        }
-    }
-
-    /**
-     * Recursively apply default attributes from globalContext to the node tree.
-     */
-    private function applyAttributes(Node $node, GlobalContext $globalContext): void
-    {
-        foreach ($node->children as $child) {
-            $this->applyAttributes($child, $globalContext);
         }
     }
 
@@ -182,35 +217,104 @@ final class RenderingPipeline
 
     private function cleanOutput(string $html): string
     {
-        // Remove empty lines that accumulate from template concatenation
-        $html = preg_replace('/^\s*\n/m', '', $html) ?? $html;
-
-        return $html;
+        // Remove empty lines that accumulate from template concatenation, but
+        // protect content inside <style>, <pre>, <textarea>, and Outlook
+        // conditional comments from getting their intentional whitespace
+        // collapsed.
+        return self::transformOutsideProtectedRegions(
+            $html,
+            static fn(string $chunk): string => preg_replace('/^\s*\n/m', '', $chunk) ?? $chunk,
+        );
     }
 
     private function minifyOutput(string $html): string
     {
-        $html = $this->stripHtmlminIgnoreMarkers($html);
+        // Honor <!-- htmlmin:ignore --> as fence markers. Content between two
+        // markers passes through unminified; markers themselves are stripped.
+        return self::applyAcrossHtmlminFences(
+            $html,
+            fn(string $chunk): string => $this->minifyChunk($chunk),
+        );
+    }
 
-        // Dependency-free conservative minification: remove whitespace between tags
-        // and trim leading/trailing whitespace, while preserving text and style content.
-        $html = preg_replace('/>\s+</', '><', $html) ?? $html;
+    private function minifyChunk(string $html): string
+    {
+        // Remove whitespace between tags outside protected regions
+        $html = self::transformOutsideProtectedRegions(
+            $html,
+            static fn(string $chunk): string => preg_replace('/>\s+</', '><', $chunk) ?? $chunk,
+        );
 
         return trim($html);
     }
 
     private function beautifyOutput(string $html): string
     {
-        $html = $this->stripHtmlminIgnoreMarkers($html);
+        return self::applyAcrossHtmlminFences(
+            $html,
+            static function (string $chunk): string {
+                $result = self::transformOutsideProtectedRegions(
+                    $chunk,
+                    static fn(string $inner): string => preg_replace('/>(?=<)/', ">\n", $inner) ?? $inner,
+                );
 
-        // Dependency-free lightweight beautification: make tag boundaries readable
-        // without attempting to reindent or parse non-standard conditional markup.
-        $html = preg_replace('/>(?=<)/', ">\n", $html) ?? $html;
-
-        return trim($html) . "\n";
+                return trim($result) . "\n";
+            },
+        );
     }
 
-    private function stripHtmlminIgnoreMarkers(string $html): string
+    /**
+     * Apply $transform to regions of $html that are not inside <style>, <pre>,
+     * <textarea>, or Outlook conditional comments. Protected regions are
+     * passed through unchanged.
+     *
+     * @param callable(string): string $transform
+     */
+    private static function transformOutsideProtectedRegions(string $html, callable $transform): string
+    {
+        $pattern = '/(<style\b[^>]*>[\s\S]*?<\/style>|<pre\b[^>]*>[\s\S]*?<\/pre>|<textarea\b[^>]*>[\s\S]*?<\/textarea>|<!--\[if[\s\S]*?<!\[endif\]-->)/i';
+
+        $parts = preg_split($pattern, $html, -1, \PREG_SPLIT_DELIM_CAPTURE);
+        if ($parts === false) {
+            return $transform($html);
+        }
+
+        $out = '';
+        foreach ($parts as $index => $segment) {
+            // Even indices are outside protected regions; odd indices are the
+            // protected regions themselves and must be preserved verbatim.
+            $out .= $index % 2 === 0 ? $transform($segment) : $segment;
+        }
+
+        return $out;
+    }
+
+    /**
+     * Honor htmlmin:ignore markers as do-not-minify fences. Apply $transform
+     * to the regions outside fences; leave fenced regions untouched. The
+     * fence markers themselves are stripped from the output.
+     *
+     * @param callable(string): string $transform
+     */
+    private static function applyAcrossHtmlminFences(string $html, callable $transform): string
+    {
+        $marker = '/\s*<!--\s*htmlmin:ignore\s*-->\s*/i';
+        $segments = preg_split($marker, $html);
+
+        if ($segments === false || \count($segments) === 1) {
+            return $transform(self::stripHtmlminIgnoreMarkers($html));
+        }
+
+        $out = '';
+        foreach ($segments as $index => $segment) {
+            // Alternating segments: even = active (transform), odd = fenced (preserve)
+            $out .= $index % 2 === 0 ? $transform($segment) : $segment;
+        }
+
+        return $out;
+    }
+
+    private static function stripHtmlminIgnoreMarkers(string $html): string
     {
         return preg_replace('/\s*<!--\s*htmlmin:ignore\s*-->\s*/i', '', $html) ?? $html;
     }

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Body;
+namespace Mjml\Component\Body;
 
-use Shyim\Mjml\Component\BodyComponent;
-use Shyim\Mjml\Helper\WidthParser;
+use Mjml\Component\BodyComponent;
+use Mjml\Helper\WidthParser;
 
 final class MjButton extends BodyComponent
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Renderer\PostProcessor;
+namespace Mjml\Renderer\PostProcessor;
 
 final class HtmlAttributeApplier
 {
@@ -34,9 +34,13 @@ final class HtmlAttributeApplier
 
         $doc = new \DOMDocument();
 
-        // Suppress warnings for HTML5 tags and preserve encoding
+        // Route libxml errors to internal buffer (HTML5 tags would otherwise
+        // emit warnings). LIBXML_NONET prevents any network access for DTDs.
+        $libxml = new \Mjml\Parser\LibXmlErrorCollector();
+        $libxml->start();
         $wrappedHtml = '<?xml encoding="UTF-8">' . $protected;
-        @$doc->loadHTML($wrappedHtml, \LIBXML_HTML_NOIMPLIED | \LIBXML_HTML_NODEFDTD | \LIBXML_NOERROR);
+        $doc->loadHTML($wrappedHtml, \LIBXML_HTML_NOIMPLIED | \LIBXML_HTML_NODEFDTD | \LIBXML_NONET);
+        $libxml->collect(restorePrevious: true);
 
         $xpath = new \DOMXPath($doc);
 
@@ -47,7 +51,10 @@ final class HtmlAttributeApplier
                 continue;
             }
 
-            $elements = @$xpath->query($xpathQuery);
+            $previousUseErrors = libxml_use_internal_errors(true);
+            $elements = $xpath->query($xpathQuery);
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousUseErrors);
 
             if ($elements === false) {
                 continue;
@@ -103,7 +110,7 @@ final class HtmlAttributeApplier
 
         // Split by whitespace for descendant combinator support
         $tokens = preg_split('/\s+/', $selector);
-        if ($tokens === false || $tokens === []) {
+        if ($tokens === false) {
             return null;
         }
 
@@ -130,22 +137,22 @@ final class HtmlAttributeApplier
         while ($token !== '') {
             if ($token[0] === '.') {
                 if (preg_match('/^\.([a-zA-Z0-9_-]+)/', $token, $m)) {
-                    $conditions[] = 'contains(concat(" ", normalize-space(@class), " "), " ' . $m[1] . ' ")';
+                    $conditions[] = 'contains(concat(" ", normalize-space(@class), " "), ' . self::xpathLiteral(' ' . $m[1] . ' ') . ')';
                     $token = substr($token, strlen($m[0]));
                 } else {
                     break;
                 }
             } elseif ($token[0] === '#') {
                 if (preg_match('/^#([a-zA-Z0-9_-]+)/', $token, $m)) {
-                    $conditions[] = '@id="' . $m[1] . '"';
+                    $conditions[] = '@id=' . self::xpathLiteral($m[1]);
                     $token = substr($token, strlen($m[0]));
                 } else {
                     break;
                 }
             } elseif ($token[0] === '[') {
-                if (preg_match('/^\[([a-zA-Z0-9_-]+)(?:="([^"]*)")?\]/', $token, $m)) {
+                if (preg_match('/^\[([a-zA-Z_][a-zA-Z0-9_-]*)(?:="([^"]*)")?\]/', $token, $m)) {
                     if (isset($m[2])) {
-                        $conditions[] = '@' . $m[1] . '="' . $m[2] . '"';
+                        $conditions[] = '@' . $m[1] . '=' . self::xpathLiteral($m[2]);
                     } else {
                         $conditions[] = '@' . $m[1];
                     }
@@ -163,5 +170,35 @@ final class HtmlAttributeApplier
         }
 
         return $tag;
+    }
+
+    /**
+     * Safely quote a string for use as an XPath 1.0 literal.
+     *
+     * XPath 1.0 has no escape syntax inside string literals, so a value
+     * containing both single and double quotes must be split via concat().
+     */
+    private static function xpathLiteral(string $value): string
+    {
+        if (!str_contains($value, "'")) {
+            return "'" . $value . "'";
+        }
+
+        if (!str_contains($value, '"')) {
+            return '"' . $value . '"';
+        }
+
+        // Contains both quote types — split on single quotes and rejoin via concat()
+        $parts = [];
+        foreach (explode("'", $value) as $i => $segment) {
+            if ($i > 0) {
+                $parts[] = '"\'"';
+            }
+            if ($segment !== '') {
+                $parts[] = "'" . $segment . "'";
+            }
+        }
+
+        return 'concat(' . implode(',', $parts) . ')';
     }
 }

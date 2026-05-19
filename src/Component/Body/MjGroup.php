@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Body;
+namespace Mjml\Component\Body;
 
-use Shyim\Mjml\Component\BodyComponent;
-use Shyim\Mjml\Context\RenderContext;
-use Shyim\Mjml\Helper\WidthParser;
+use Mjml\Component\BodyComponent;
+use Mjml\Context\RenderContext;
+use Mjml\Helper\WidthParser;
 
 final class MjGroup extends BodyComponent
 {

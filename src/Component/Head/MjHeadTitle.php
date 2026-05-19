@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Head;
+namespace Mjml\Component\Head;
 
-use Shyim\Mjml\Component\HeadComponent;
+use Mjml\Component\HeadComponent;
 
 final class MjHeadTitle extends HeadComponent
 {
@@ -30,6 +30,6 @@ final class MjHeadTitle extends HeadComponent
 
     public function handler(): void
     {
-        $this->globalContext->title = $this->getContent();
+        $this->globalContext->setTitle($this->getContent());
     }
 }

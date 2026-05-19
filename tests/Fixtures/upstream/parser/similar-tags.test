@@ -1,0 +1,24 @@
+--OPTIONS--
+validationLevel: skip
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text>MJML</mj-text>
+        <mj-text attr="val">FTW</mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-text attr="val">FTW</mj-text>
+        <mj-text>MJML</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+MJML
+FTW

@@ -2,8 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Parser;
+namespace Mjml\Parser;
 
+/**
+ * Internal AST node used by the parser and renderer.
+ *
+ * @internal Exposed through MjmlResult::$json for debugging only; the shape
+ *           is not part of the public API and may change without notice.
+ */
 final class Node
 {
     /**

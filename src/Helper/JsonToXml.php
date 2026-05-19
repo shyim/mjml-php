@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Helper;
+namespace Mjml\Helper;
 
-use Shyim\Mjml\Parser\Node;
+use Mjml\Parser\Node;
 
 final class JsonToXml
 {

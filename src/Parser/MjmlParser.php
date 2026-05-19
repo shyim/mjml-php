@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Parser;
+namespace Mjml\Parser;
 
-use Shyim\Mjml\Component\ComponentRegistry;
-use Shyim\Mjml\MjmlOptions;
+use Mjml\Component\ComponentRegistry;
+use Mjml\MjmlOptions;
 
 final class MjmlParser
 {
@@ -14,6 +14,8 @@ final class MjmlParser
 
     /** @var list<Node> Accumulated CSS includes to be added to mj-head */
     private array $cssIncludes = [];
+
+    private LibXmlErrorCollector $libxmlErrors;
 
     private readonly bool $ignoreIncludes;
 
@@ -31,6 +33,7 @@ final class MjmlParser
         $this->ignoreIncludes = ($options !== null) ? $options->ignoreIncludes : true;
         $this->keepComments = ($options !== null) ? $options->keepComments : true;
         $this->includePath = ($options !== null) ? ($options->includePath ?? []) : [];
+        $this->libxmlErrors = new LibXmlErrorCollector();
 
         // Determine working directory for path resolution
         $filePath = $options?->filePath;
@@ -54,19 +57,31 @@ final class MjmlParser
     {
         $this->includeStack = [];
         $this->cssIncludes = [];
+        $this->libxmlErrors = new LibXmlErrorCollector();
+
+        // Empty / whitespace-only input: return an empty <mjml/> tree rather
+        // than triggering DOMDocument::loadXML's ValueError on empty source.
+        if (trim($mjml) === '') {
+            return new Node(tagName: 'mjml', file: $filePath);
+        }
 
         // Pre-process: extract ending tag content before XML parsing
         $mjml = $this->extractEndingTagContent($mjml);
 
-        // Suppress XML errors and handle them ourselves
-        $previousUseErrors = libxml_use_internal_errors(true);
+        // Suppress XML errors and handle them ourselves.
+        //
+        // Safety notes for libxml usage in this method and parseIncludeContent():
+        // - LIBXML_NONET disables network access for external DTDs / entities.
+        // - PHP 8 (with libxml >= 2.9) does not resolve external entities by
+        //   default, so XXE is not exploitable through this parser. We do not
+        //   call libxml_disable_entity_loader() (deprecated since PHP 8).
+        $collector = $this->libxmlErrors;
+        $collector->start();
 
         $doc = new \DOMDocument();
         $doc->loadXML($mjml, \LIBXML_NONET | \LIBXML_NOWARNING);
 
-        $errors = libxml_get_errors();
-        libxml_clear_errors();
-        libxml_use_internal_errors($previousUseErrors);
+        $collector->collect(restorePrevious: true);
 
         $root = $doc->documentElement;
 
@@ -77,7 +92,7 @@ final class MjmlParser
         $node = $this->domToNode($root, $filePath);
 
         // Merge accumulated CSS includes into mj-head
-        if (count($this->cssIncludes) > 0) {
+        if ($this->cssIncludes !== []) {
             $this->mergeCssIncludes($node);
         }
 
@@ -86,6 +101,11 @@ final class MjmlParser
 
     /**
      * Convert a DOMElement to our Node tree.
+     *
+     * Note: mutates $this->cssIncludes when nested mj-include tags
+     * contribute CSS/MJML head children.
+     *
+     * @phpstan-impure
      */
     private function domToNode(\DOMElement $element, ?string $filePath): Node
     {
@@ -254,7 +274,7 @@ final class MjmlParser
 
         // Circular include detection
         if (\in_array($absolutePath, $this->includeStack, true)) {
-            throw new \RuntimeException("Circular inclusion detected on file : {$absolutePath}");
+            throw new ParseException("Circular inclusion detected on file : {$absolutePath}");
         }
 
         $this->includeStack[] = $absolutePath;
@@ -308,13 +328,13 @@ final class MjmlParser
     {
         $mjml = $this->extractEndingTagContent($mjml);
 
-        $previousUseErrors = libxml_use_internal_errors(true);
+        $collector = $this->libxmlErrors;
+        $collector->start();
 
         $doc = new \DOMDocument();
         $doc->loadXML($mjml, \LIBXML_NONET | \LIBXML_NOWARNING);
 
-        libxml_clear_errors();
-        libxml_use_internal_errors($previousUseErrors);
+        $collector->collect();
 
         $root = $doc->documentElement;
 
@@ -490,16 +510,21 @@ final class MjmlParser
     /**
      * Extract content from ending tags and store as base64-encoded attribute.
      *
-     * This is needed because ending tag content (like mj-text, mj-button) can contain
-     * arbitrary HTML that would break XML parsing.
+     * This is needed because ending tag content (like mj-text, mj-button) can
+     * contain arbitrary HTML that would otherwise break XML parsing.
+     *
+     * Implementation: a single forward pass over the input that tracks the
+     * tag-name stack so nested same-name ending tags ({@code <mj-text>…
+     * <mj-text>…</mj-text>…</mj-text>}) are matched correctly. This avoids
+     * the pitfalls of a greedy/lazy regex on (.*?) which mis-pairs nested
+     * tags and consumes content past the first matching close tag.
      */
     private function extractEndingTagContent(string $mjml): string
     {
-        // Get all ending tag names from the registry
         $endingTags = [];
         foreach ($this->registry->getTagNames() as $tagName) {
             if ($this->registry->isEndingTag($tagName)) {
-                $endingTags[] = preg_quote($tagName, '/');
+                $endingTags[$tagName] = true;
             }
         }
 
@@ -507,40 +532,290 @@ final class MjmlParser
             return $mjml;
         }
 
-        $pattern = implode('|', $endingTags);
+        $length = strlen($mjml);
+        $out = '';
+        $i = 0;
 
-        // Match opening tag (NOT self-closing) with attributes, capture everything until closing tag
-        // Use a non-greedy match to handle nested same-name tags
-        // The negative lookbehind (?<!\/) ensures we don't match self-closing tags like <mj-text ... />
-        return preg_replace_callback(
-            '/(<(' . $pattern . ')(\s[^>]*?)?(?<!\/)>)(.*?)(<\/\2>)/s',
-            static function (array $matches): string {
-                $openTag = $matches[1];
-                $tagName = $matches[2];
-                $content = $matches[4];
-                $closeTag = $matches[5];
+        while ($i < $length) {
+            $lt = strpos($mjml, '<', $i);
+            if ($lt === false) {
+                $out .= substr($mjml, $i);
+                break;
+            }
 
-                if (trim($content) === '') {
-                    return $openTag . $closeTag;
+            // Emit text up to the '<'
+            $out .= substr($mjml, $i, $lt - $i);
+            $i = $lt;
+
+            // Skip XML comments verbatim
+            if (substr_compare($mjml, '<!--', $i, 4) === 0) {
+                $end = strpos($mjml, '-->', $i + 4);
+                if ($end === false) {
+                    $out .= substr($mjml, $i);
+                    break;
                 }
+                $out .= substr($mjml, $i, $end - $i + 3);
+                $i = $end + 3;
+                continue;
+            }
 
-                // Store content as base64 in a special attribute
+            // CDATA sections and processing instructions / doctypes pass through
+            if (substr_compare($mjml, '<![CDATA[', $i, 9) === 0) {
+                $end = strpos($mjml, ']]>', $i + 9);
+                if ($end === false) {
+                    $out .= substr($mjml, $i);
+                    break;
+                }
+                $out .= substr($mjml, $i, $end - $i + 3);
+                $i = $end + 3;
+                continue;
+            }
+
+            // Try to parse an opening tag for an ending-tag component
+            $match = self::matchOpeningTag($mjml, $i, $endingTags);
+            if ($match === null) {
+                // Not a recognized ending-tag open — emit the '<' and continue
+                $out .= '<';
+                $i++;
+                continue;
+            }
+
+            [$tagName, $openTag, $isSelfClosing, $afterOpen] = $match;
+
+            if ($isSelfClosing) {
+                $out .= $openTag;
+                $i = $afterOpen;
+                continue;
+            }
+
+            // Scan forward, depth-aware, until the matching closing tag
+            $contentStart = $afterOpen;
+            $contentEnd = self::findMatchingClose($mjml, $contentStart, $tagName);
+
+            if ($contentEnd === null) {
+                // Unbalanced — emit the open and let the XML parser fail loudly
+                $out .= $openTag;
+                $i = $afterOpen;
+                continue;
+            }
+
+            $content = substr($mjml, $contentStart, $contentEnd - $contentStart);
+            $closeLen = strlen('</' . $tagName . '>');
+
+            if (trim($content) === '') {
+                $out .= $openTag . '</' . $tagName . '>';
+            } else {
                 $encoded = base64_encode($content);
+                $openTagWithAttr = substr($openTag, 0, -1) . " __mjml_content__=\"{$encoded}\">";
+                $out .= $openTagWithAttr . '</' . $tagName . '>';
+            }
 
-                // Insert the special attribute into the opening tag
-                if (str_ends_with($openTag, '/>')) {
-                    // Self-closing, shouldn't happen for ending tags but handle it
-                    return str_replace('/>', " __mjml_content__=\"{$encoded}\" />", $openTag);
+            $i = $contentEnd + $closeLen;
+        }
+
+        return $out;
+    }
+
+    /**
+     * Try to parse an opening tag at $pos. Returns null if it's not an
+     * opening tag for a registered ending-tag component.
+     *
+     * @param array<string, true> $endingTags
+     * @return array{0: string, 1: string, 2: bool, 3: int}|null
+     *         [tagName, fullOpenTag (incl. '>'), isSelfClosing, posAfterOpenTag]
+     */
+    private static function matchOpeningTag(string $mjml, int $pos, array $endingTags): ?array
+    {
+        if (!isset($mjml[$pos]) || $mjml[$pos] !== '<') {
+            return null;
+        }
+
+        // Closing tag start (handled by caller)
+        if (isset($mjml[$pos + 1]) && $mjml[$pos + 1] === '/') {
+            return null;
+        }
+
+        // Extract the tag name
+        $nameStart = $pos + 1;
+        $nameEnd = $nameStart;
+        $len = strlen($mjml);
+        while ($nameEnd < $len) {
+            $c = $mjml[$nameEnd];
+            if ($c === '>' || $c === '/' || $c === ' ' || $c === "\t" || $c === "\n" || $c === "\r") {
+                break;
+            }
+            $nameEnd++;
+        }
+
+        if ($nameEnd === $nameStart) {
+            return null;
+        }
+
+        $tagName = substr($mjml, $nameStart, $nameEnd - $nameStart);
+        if (!isset($endingTags[$tagName])) {
+            return null;
+        }
+
+        // Walk through attributes to find the end of the opening tag.
+        // Attribute values may contain '>' so we must respect quoted strings.
+        $i = $nameEnd;
+        $inQuote = null;
+        while ($i < $len) {
+            $c = $mjml[$i];
+
+            if ($inQuote !== null) {
+                if ($c === $inQuote) {
+                    $inQuote = null;
                 }
+                $i++;
+                continue;
+            }
 
-                $pos = strpos($openTag, '>');
-                if ($pos !== false) {
-                    $openTag = substr($openTag, 0, $pos) . " __mjml_content__=\"{$encoded}\">";
+            if ($c === '"' || $c === '\'') {
+                $inQuote = $c;
+                $i++;
+                continue;
+            }
+
+            if ($c === '>') {
+                $isSelfClosing = $i > 0 && $mjml[$i - 1] === '/';
+                $openTag = substr($mjml, $pos, $i - $pos + 1);
+                return [$tagName, $openTag, $isSelfClosing, $i + 1];
+            }
+
+            $i++;
+        }
+
+        return null;
+    }
+
+    /**
+     * Find the position of the matching '</tagName>' starting at $pos,
+     * tracking nested opens of the same tag. Comments, CDATA, and quoted
+     * attribute values are skipped so the depth counter is not fooled.
+     */
+    private static function findMatchingClose(string $mjml, int $pos, string $tagName): ?int
+    {
+        $depth = 1;
+        $len = strlen($mjml);
+        $openMarker = '<' . $tagName;
+        $closeMarker = '</' . $tagName;
+        $openMarkerLen = strlen($openMarker);
+        $closeMarkerLen = strlen($closeMarker);
+
+        while ($pos < $len) {
+            $next = strpos($mjml, '<', $pos);
+            if ($next === false) {
+                return null;
+            }
+
+            // Comments
+            if (substr_compare($mjml, '<!--', $next, 4) === 0) {
+                $end = strpos($mjml, '-->', $next + 4);
+                if ($end === false) {
+                    return null;
                 }
+                $pos = $end + 3;
+                continue;
+            }
 
-                return $openTag . $closeTag;
-            },
-            $mjml,
-        ) ?? $mjml;
+            // CDATA
+            if (substr_compare($mjml, '<![CDATA[', $next, 9) === 0) {
+                $end = strpos($mjml, ']]>', $next + 9);
+                if ($end === false) {
+                    return null;
+                }
+                $pos = $end + 3;
+                continue;
+            }
+
+            // Closing tag for this name?
+            if (substr_compare($mjml, $closeMarker, $next, $closeMarkerLen) === 0) {
+                $after = $next + $closeMarkerLen;
+                if ($after < $len) {
+                    $c = $mjml[$after];
+                    // Permit </tag> and </tag > but not </tagFoo>
+                    if ($c === '>' || $c === ' ' || $c === "\t" || $c === "\n" || $c === "\r") {
+                        // Find the closing '>'
+                        $gt = strpos($mjml, '>', $after);
+                        if ($gt === false) {
+                            return null;
+                        }
+                        $depth--;
+                        if ($depth === 0) {
+                            return $next; // position of the '<' of the closing tag
+                        }
+                        $pos = $gt + 1;
+                        continue;
+                    }
+                }
+            }
+
+            // Nested opening tag of the same name?
+            if (substr_compare($mjml, $openMarker, $next, $openMarkerLen) === 0) {
+                $after = $next + $openMarkerLen;
+                if ($after < $len) {
+                    $c = $mjml[$after];
+                    if ($c === '>' || $c === '/' || $c === ' ' || $c === "\t" || $c === "\n" || $c === "\r") {
+                        // Skip over this opening tag, accounting for quoted attrs
+                        $tagEnd = self::skipToTagEnd($mjml, $after);
+                        if ($tagEnd === null) {
+                            return null;
+                        }
+                        // If self-closing, depth is unchanged
+                        if ($mjml[$tagEnd - 1] !== '/') {
+                            $depth++;
+                        }
+                        $pos = $tagEnd + 1;
+                        continue;
+                    }
+                }
+            }
+
+            $pos = $next + 1;
+        }
+
+        return null;
+    }
+
+    /**
+     * Given a position inside an opening tag (after the tag name), return the
+     * index of the closing '>' respecting quoted attribute values.
+     */
+    private static function skipToTagEnd(string $mjml, int $pos): ?int
+    {
+        $len = strlen($mjml);
+        $inQuote = null;
+
+        while ($pos < $len) {
+            $c = $mjml[$pos];
+
+            if ($inQuote !== null) {
+                if ($c === $inQuote) {
+                    $inQuote = null;
+                }
+                $pos++;
+                continue;
+            }
+
+            if ($c === '"' || $c === '\'') {
+                $inQuote = $c;
+                $pos++;
+                continue;
+            }
+
+            if ($c === '>') {
+                return $pos;
+            }
+
+            $pos++;
+        }
+
+        return null;
+    }
+
+    public function getLibxmlErrors(): LibXmlErrorCollector
+    {
+        return $this->libxmlErrors;
     }
 }

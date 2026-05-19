@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Head;
+namespace Mjml\Component\Head;
 
-use Shyim\Mjml\Component\HeadComponent;
+use Mjml\Component\HeadComponent;
 
 final class MjHeadAttributes extends HeadComponent
 {
@@ -40,10 +40,7 @@ final class MjHeadAttributes extends HeadComponent
                 $classAttrs = $attributes;
                 unset($classAttrs['name']);
 
-                $this->globalContext->classes[$className] = array_merge(
-                    $this->globalContext->classes[$className] ?? [],
-                    $classAttrs,
-                );
+                $this->globalContext->mergeClasses($className, $classAttrs);
 
                 // Process children of mj-class for classesDefault
                 // Each child's tagName maps to its attributes
@@ -52,16 +49,10 @@ final class MjHeadAttributes extends HeadComponent
                     $childDefaults[$classChild->tagName] = $classChild->attributes;
                 }
 
-                $this->globalContext->classesDefault[$className] = array_merge(
-                    $this->globalContext->classesDefault[$className] ?? [],
-                    $childDefaults,
-                );
+                $this->globalContext->mergeClassesDefault($className, $childDefaults);
             } else {
                 // For mj-all, mj-text, mj-section, etc. — store as defaultAttributes
-                $this->globalContext->defaultAttributes[$tagName] = array_merge(
-                    $this->globalContext->defaultAttributes[$tagName] ?? [],
-                    $attributes,
-                );
+                $this->globalContext->mergeDefaultAttributes($tagName, $attributes);
             }
         }
     }

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Head;
+namespace Mjml\Component\Head;
 
-use Shyim\Mjml\Component\HeadComponent;
+use Mjml\Component\HeadComponent;
 
 final class MjHeadFont extends HeadComponent
 {
@@ -32,7 +32,7 @@ final class MjHeadFont extends HeadComponent
         $href = $this->getAttribute('href');
 
         if ($name !== null && $href !== null) {
-            $this->globalContext->fonts[$name] = $href;
+            $this->globalContext->addFont($name, $href);
         }
     }
 }

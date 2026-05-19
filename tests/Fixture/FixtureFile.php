@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Tests\Fixture;
+namespace Mjml\Tests\Fixture;
 
-use Shyim\Mjml\MjmlOptions;
-use Shyim\Mjml\Validation\ValidationLevel;
+use Mjml\MjmlOptions;
+use Mjml\Validation\ValidationLevel;
 
 final readonly class FixtureFile
 {

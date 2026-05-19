@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Head;
+namespace Mjml\Component\Head;
 
-use Shyim\Mjml\Component\HeadComponent;
+use Mjml\Component\HeadComponent;
 
 final class MjHeadBreakpoint extends HeadComponent
 {
@@ -35,7 +35,7 @@ final class MjHeadBreakpoint extends HeadComponent
         $width = $this->getAttribute('width');
 
         if ($width !== null) {
-            $this->globalContext->breakpoint = $width;
+            $this->globalContext->setBreakpoint($width);
         }
     }
 }

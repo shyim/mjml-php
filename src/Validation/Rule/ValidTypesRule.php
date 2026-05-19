@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Validation\Rule;
+namespace Mjml\Validation\Rule;
 
-use Shyim\Mjml\Component\ComponentRegistry;
-use Shyim\Mjml\Parser\Node;
-use Shyim\Mjml\Validation\ValidationError;
+use Mjml\Component\ComponentRegistry;
+use Mjml\Parser\Node;
+use Mjml\Validation\ValidationError;
 
 /**
  * Validates that attribute values match their declared types (color, unit, enum, etc.).
  */
 final class ValidTypesRule implements ValidationRuleInterface
 {
+    /** @var array<string, string> Cache of compiled unit-validation regex patterns keyed by typeSpec */
+    private static array $unitPatternCache = [];
+
     public function validate(Node $node, ComponentRegistry $registry): ?array
     {
         $componentClass = $registry->get($node->tagName);
@@ -125,8 +128,6 @@ final class ValidTypesRule implements ValidationRuleInterface
 
     private function validateUnit(string $value, string $typeSpec): ?string
     {
-        $allowNeg = str_starts_with($typeSpec, 'unitWithNegative');
-
         // Parse units from "unit(px,%)" or "unitWithNegative(px,%)"
         if (!preg_match('/\(([^)]+)\)/', $typeSpec, $unitMatch)) {
             return null;
@@ -140,15 +141,21 @@ final class ValidTypesRule implements ValidationRuleInterface
             $args = array_map('trim', explode(',', $argsMatch[1]));
         }
 
-        $allowAuto = \in_array('auto', $units, true);
-        $filteredUnits = array_filter($units, static fn(string $u) => $u !== 'auto');
+        $pattern = self::$unitPatternCache[$typeSpec] ?? null;
 
-        $negPart = $allowNeg ? '-?' : '';
-        $unitsPart = implode('|', array_map(static fn(string $u) => preg_quote($u, '/'), $filteredUnits));
-        $autoPart = $allowAuto ? '|auto' : '';
+        if ($pattern === null) {
+            $allowNeg = str_starts_with($typeSpec, 'unitWithNegative');
+            $allowAuto = \in_array('auto', $units, true);
+            $filteredUnits = array_filter($units, static fn(string $u) => $u !== 'auto');
 
-        $repeatPart = implode(',', $args);
-        $pattern = '/^(((' . $negPart . '[\d,.]+)(' . $unitsPart . ')|0' . $autoPart . ')( )?){' . $repeatPart . '}$/';
+            $negPart = $allowNeg ? '-?' : '';
+            $unitsPart = implode('|', array_map(static fn(string $u) => preg_quote($u, '/'), $filteredUnits));
+            $autoPart = $allowAuto ? '|auto' : '';
+
+            $repeatPart = implode(',', $args);
+            $pattern = '/^(((' . $negPart . '[\d,.]+)(' . $unitsPart . ')|0' . $autoPart . ')( )?){' . $repeatPart . '}$/';
+            self::$unitPatternCache[$typeSpec] = $pattern;
+        }
 
         if (preg_match($pattern, $value)) {
             return null;

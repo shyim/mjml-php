@@ -1,0 +1,37 @@
+--OPTIONS--
+validationLevel: skip
+
+--MJML--
+<mjml>
+  <mj-head>
+    <mj-title></mj-title>
+    <mj-attributes>
+      <mj-text font-size="27px" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body>
+    <mj-section>
+      <mj-column width="65%">
+        <mj-text mj-class="small" align="left" font-family="Helvetica" color="#000000" padding-top="20px">
+          coin
+          <a href="https://test" style="text-decoration:underline;color:#336666;font-weight:bold" class="mobile-small-letters">Majors and Minors</a>
+          bla
+          <a href="https://test" style="text-decoration:underline;color:#336666;font-weight:bold" class="mobile-small-letters">Majors and Minors</a>
+          <mj-raw>
+            coin
+          </mj-raw>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+font-size:27px;
+mj-column-per-65
+font-family:Helvetica;
+color:#000000;
+padding-top:20px;
+coin
+Majors and Minors
+<mj-raw>

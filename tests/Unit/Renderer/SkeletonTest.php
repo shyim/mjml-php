@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Tests\Unit\Renderer;
+namespace Mjml\Tests\Unit\Renderer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Shyim\Mjml\Context\GlobalContext;
-use Shyim\Mjml\MjmlOptions;
-use Shyim\Mjml\Renderer\Skeleton;
+use Mjml\Context\GlobalContext;
+use Mjml\MjmlOptions;
+use Mjml\Renderer\Skeleton;
 
 final class SkeletonTest extends TestCase
 {
@@ -22,30 +22,30 @@ final class SkeletonTest extends TestCase
 
         // componentsHeadStyle adds 1 extra style tag
         $ctx = new GlobalContext();
-        $ctx->componentsHeadStyle[] = static fn(string $breakpoint): string => '.custom-component-1 .custom-child { background: red; }';
+        $ctx->addComponentHeadStyle(static fn(string $breakpoint): string => '.custom-component-1 .custom-child { background: red; }');
         yield 'with componentsHeadStyle' => [$ctx, 2];
 
         // headStyle adds 1 extra style tag
         $ctx = new GlobalContext();
-        $ctx->headStyle['custom-component'] = static fn(string $breakpoint): string => '.custom-component .custom-child { background: orange; }';
+        $ctx->addHeadStyle('custom-component', static fn(string $breakpoint): string => '.custom-component .custom-child { background: orange; }');
         yield 'with headStyle' => [$ctx, 2];
 
         // componentsHeadStyle + headStyle are combined into 1 style tag
         $ctx = new GlobalContext();
-        $ctx->componentsHeadStyle[] = static fn(string $breakpoint): string => '.custom-component-1 .custom-child { background: yellow; }';
-        $ctx->headStyle['custom-component'] = static fn(string $breakpoint): string => '.custom-component .custom-child { background: green; }';
+        $ctx->addComponentHeadStyle(static fn(string $breakpoint): string => '.custom-component-1 .custom-child { background: yellow; }');
+        $ctx->addHeadStyle('custom-component', static fn(string $breakpoint): string => '.custom-component .custom-child { background: green; }');
         yield 'with componentsHeadStyle and headStyle' => [$ctx, 2];
 
         // style array adds 1 extra style tag
         $ctx = new GlobalContext();
-        $ctx->styles[] = '#title { background: blue; }';
+        $ctx->addStyle('#title { background: blue; }');
         yield 'with styles' => [$ctx, 2];
 
         // All three together: componentsHeadStyle+headStyle combined + styles = 2 extra
         $ctx = new GlobalContext();
-        $ctx->componentsHeadStyle[] = static fn(string $breakpoint): string => '.custom-component-1 .custom-child { background: purple; }';
-        $ctx->headStyle['custom-component'] = static fn(string $breakpoint): string => '.custom-component .custom-child { background: black; }';
-        $ctx->styles[] = '#title { background: white; }';
+        $ctx->addComponentHeadStyle(static fn(string $breakpoint): string => '.custom-component-1 .custom-child { background: purple; }');
+        $ctx->addHeadStyle('custom-component', static fn(string $breakpoint): string => '.custom-component .custom-child { background: black; }');
+        $ctx->addStyle('#title { background: white; }');
         yield 'with all style sources' => [$ctx, 3];
     }
 

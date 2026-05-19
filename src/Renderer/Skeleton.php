@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Renderer;
+namespace Mjml\Renderer;
 
-use Shyim\Mjml\Context\GlobalContext;
-use Shyim\Mjml\Helper\Fonts;
-use Shyim\Mjml\MjmlOptions;
+use Mjml\Context\GlobalContext;
+use Mjml\Helper\Fonts;
+use Mjml\MjmlOptions;
 
 final class Skeleton
 {
@@ -15,29 +15,37 @@ final class Skeleton
      */
     public function build(string $bodyContent, GlobalContext $context, MjmlOptions $options): string
     {
-        $fontsTags = Fonts::buildFontsTags($bodyContent, $context->inlineStyles, $context->fonts);
+        $fontsTags = Fonts::buildFontsTags($bodyContent, $context->getInlineStyles(), $context->getFonts());
         $mediaQueriesTags = $this->buildMediaQueriesTags($context);
         $componentStyleTags = $this->buildStyleFromComponents($context);
         $styleTags = $this->buildStyleFromTags($context);
-        $headRaw = implode("\n", array_filter($context->headRaw));
-        $previewTag = $this->buildPreview($context->preview);
+        $headRaw = implode("\n", array_filter($context->getHeadRaw()));
+        $previewTag = $this->buildPreview($context->getPreview());
 
-        $backgroundStyle = $context->backgroundColor !== ''
-            ? "background-color:{$context->backgroundColor};"
+        $backgroundColor = $context->getBackgroundColor();
+        $backgroundStyle = $backgroundColor !== ''
+            ? "background-color:{$backgroundColor};"
             : '';
 
-        $beforeDoctype = $context->beforeDoctype !== ''
-            ? $context->beforeDoctype . "\n"
+        $beforeDoctype = $context->getBeforeDoctype();
+        $beforeDoctype = $beforeDoctype !== ''
+            ? $beforeDoctype . "\n"
             : '';
 
-        $bodyId = $context->bodyId !== null ? " id=\"{$context->bodyId}\"" : '';
-        $bodyCssClass = $context->bodyCssClass !== null ? " class=\"{$context->bodyCssClass}\"" : '';
+        $bodyId = $context->getBodyId();
+        $bodyIdAttr = $bodyId !== null ? " id=\"{$bodyId}\"" : '';
+        $bodyCssClass = $context->getBodyCssClass();
+        $bodyCssClassAttr = $bodyCssClass !== null ? " class=\"{$bodyCssClass}\"" : '';
+
+        $language = $context->getLanguage();
+        $dir = $context->getDir();
+        $title = $context->getTitle();
 
         return <<<HTML
 {$beforeDoctype}<!doctype html>
-<html lang="{$context->language}" dir="{$context->dir}" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<html lang="{$language}" dir="{$dir}" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
   <head>
-    <title>{$context->title}</title>
+    <title>{$title}</title>
     <!--[if !mso]><!-->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!--<![endif]-->
@@ -98,7 +106,7 @@ final class Skeleton
     {$styleTags}
     {$headRaw}
   </head>
-  <body{$bodyId}{$bodyCssClass} style="word-spacing:normal;{$backgroundStyle}">
+  <body{$bodyIdAttr}{$bodyCssClassAttr} style="word-spacing:normal;{$backgroundStyle}">
     {$previewTag}
     {$bodyContent}
   </body>
@@ -108,7 +116,8 @@ HTML;
 
     private function buildMediaQueriesTags(GlobalContext $context): string
     {
-        if ($context->mediaQueries === []) {
+        $mediaQueries = $context->getMediaQueries();
+        if ($mediaQueries === []) {
             return '';
         }
 
@@ -116,13 +125,13 @@ HTML;
         $thunderbirdRules = [];
         $owaRules = [];
 
-        foreach ($context->mediaQueries as $className => $rule) {
+        foreach ($mediaQueries as $className => $rule) {
             $baseRules[] = ".{$className} {$rule}";
             $thunderbirdRules[] = ".moz-text-html .{$className} {$rule}";
             $owaRules[] = "[owa] .{$className} {$rule}";
         }
 
-        $breakpoint = $context->breakpoint;
+        $breakpoint = $context->getBreakpoint();
         $baseRulesStr = implode("\n", $baseRules);
         $thunderbirdRulesStr = implode("\n", $thunderbirdRules);
 
@@ -140,7 +149,7 @@ HTML;
 
 HTML;
 
-        if ($context->forceOWADesktop) {
+        if ($context->getForceOWADesktop()) {
             $owaRulesStr = implode("\n", $owaRules);
 
             $output .= <<<HTML
@@ -155,21 +164,25 @@ HTML;
 
     private function buildStyleFromComponents(GlobalContext $context): string
     {
-        if ($context->componentsHeadStyle === [] && $context->headStyle === []) {
+        $componentsHeadStyle = $context->getComponentsHeadStyle();
+        $headStyle = $context->getHeadStyle();
+
+        if ($componentsHeadStyle === [] && $headStyle === []) {
             return '';
         }
 
+        $breakpoint = $context->getBreakpoint();
         $styles = '';
 
-        foreach ($context->componentsHeadStyle as $styleFunc) {
-            $result = $styleFunc($context->breakpoint);
+        foreach ($componentsHeadStyle as $styleFunc) {
+            $result = $styleFunc($breakpoint);
             if ($result !== '') {
                 $styles .= $result . "\n";
             }
         }
 
-        foreach ($context->headStyle as $styleFunc) {
-            $result = $styleFunc($context->breakpoint);
+        foreach ($headStyle as $styleFunc) {
+            $result = $styleFunc($breakpoint);
             if ($result !== '') {
                 $styles .= $result . "\n";
             }
@@ -184,13 +197,14 @@ HTML;
 
     private function buildStyleFromTags(GlobalContext $context): string
     {
-        if ($context->styles === []) {
+        $styles = $context->getStyles();
+        if ($styles === []) {
             return '';
         }
 
-        $styles = implode("\n", $context->styles);
+        $stylesStr = implode("\n", $styles);
 
-        return "    <style type=\"text/css\">\n{$styles}\n    </style>";
+        return "    <style type=\"text/css\">\n{$stylesStr}\n    </style>";
     }
 
     private function buildPreview(string $preview): string

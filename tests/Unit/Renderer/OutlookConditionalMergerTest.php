@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Tests\Unit\Renderer;
+namespace Mjml\Tests\Unit\Renderer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Shyim\Mjml\Renderer\PostProcessor\OutlookConditionalMerger;
+use Mjml\Renderer\PostProcessor\OutlookConditionalMerger;
 
 final class OutlookConditionalMergerTest extends TestCase
 {

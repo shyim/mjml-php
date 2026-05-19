@@ -14,5 +14,5 @@ filePath: circular
 </mjml>
 
 --EXCEPTION--
-RuntimeException
+Mjml\Parser\ParseException
 Circular inclusion detected

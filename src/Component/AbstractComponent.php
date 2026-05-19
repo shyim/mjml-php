@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component;
+namespace Mjml\Component;
 
-use Shyim\Mjml\Attribute\AttributeFormatter;
-use Shyim\Mjml\Context\GlobalContext;
-use Shyim\Mjml\Context\RenderContext;
-use Shyim\Mjml\Parser\MjmlParser;
-use Shyim\Mjml\Parser\Node;
+use Mjml\Attribute\AttributeMerger;
+use Mjml\Context\GlobalContext;
+use Mjml\Context\RenderContext;
+use Mjml\Parser\MjmlParser;
+use Mjml\Parser\Node;
 
 abstract class AbstractComponent implements ComponentInterface
 {
-    /** @var array<string, string> */
+    /** @var array<string, string|null> */
     protected array $attributes;
 
     public function __construct(
@@ -93,7 +93,7 @@ abstract class AbstractComponent implements ComponentInterface
     /**
      * Build the final attributes by merging defaults, global defaults, class defaults, and explicit values.
      *
-     * @return array<string, string>
+     * @return array<string, string|null>
      */
     private function buildAttributes(): array
     {
@@ -103,13 +103,14 @@ abstract class AbstractComponent implements ComponentInterface
         $attrs = static::defaultAttributes();
 
         // Apply global defaults from mj-attributes (for mj-all)
-        if (isset($this->globalContext->defaultAttributes['mj-all'])) {
-            $attrs = array_merge($attrs, $this->globalContext->defaultAttributes['mj-all']);
+        $defaultAttributes = $this->globalContext->getDefaultAttributes();
+        if (isset($defaultAttributes['mj-all'])) {
+            $attrs = array_merge($attrs, $defaultAttributes['mj-all']);
         }
 
         // Apply component-specific defaults from mj-attributes
-        if (isset($this->globalContext->defaultAttributes[$componentName])) {
-            $attrs = array_merge($attrs, $this->globalContext->defaultAttributes[$componentName]);
+        if (isset($defaultAttributes[$componentName])) {
+            $attrs = array_merge($attrs, $defaultAttributes[$componentName]);
         }
 
         // Apply mj-class attributes
@@ -122,8 +123,9 @@ abstract class AbstractComponent implements ComponentInterface
                 }
 
                 // Direct class attributes (from mj-class tag's own attributes)
-                if (isset($this->globalContext->classes[$className])) {
-                    $classValues = $this->globalContext->classes[$className];
+                $classes = $this->globalContext->getClasses();
+                if (isset($classes[$className])) {
+                    $classValues = $classes[$className];
 
                     // Merge css-class values instead of overwriting
                     if (isset($attrs['css-class'], $classValues['css-class'])) {
@@ -134,13 +136,14 @@ abstract class AbstractComponent implements ComponentInterface
                 }
 
                 // Class-level defaults for all components
-                if (isset($this->globalContext->classesDefault[$className]['mj-all'])) {
-                    $attrs = array_merge($attrs, $this->globalContext->classesDefault[$className]['mj-all']);
+                $classesDefault = $this->globalContext->getClassesDefault();
+                if (isset($classesDefault[$className]['mj-all'])) {
+                    $attrs = array_merge($attrs, $classesDefault[$className]['mj-all']);
                 }
 
                 // Class-level defaults for this component
-                if (isset($this->globalContext->classesDefault[$className][$componentName])) {
-                    $attrs = array_merge($attrs, $this->globalContext->classesDefault[$className][$componentName]);
+                if (isset($classesDefault[$className][$componentName])) {
+                    $attrs = array_merge($attrs, $classesDefault[$className][$componentName]);
                 }
             }
         }
@@ -151,6 +154,6 @@ abstract class AbstractComponent implements ComponentInterface
 
         $attrs = array_merge($attrs, $explicit);
 
-        return AttributeFormatter::format($attrs, static::allowedAttributes());
+        return AttributeMerger::merge($attrs, static::allowedAttributes());
     }
 }

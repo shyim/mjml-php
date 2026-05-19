@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml;
+namespace Mjml;
 
-use Shyim\Mjml\Validation\ValidationLevel;
+use Mjml\Validation\ValidationLevel;
 
 final readonly class MjmlOptions
 {

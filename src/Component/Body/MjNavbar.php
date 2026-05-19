@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Body;
+namespace Mjml\Component\Body;
 
-use Shyim\Mjml\Component\BodyComponent;
+use Mjml\Component\BodyComponent;
 
 final class MjNavbar extends BodyComponent
 {
@@ -61,7 +61,7 @@ final class MjNavbar extends BodyComponent
 
     public function getComponentHeadStyle(): string
     {
-        $breakpoint = $this->globalContext->breakpoint;
+        $breakpoint = $this->globalContext->getBreakpoint();
         $bpValue = (int) $breakpoint;
         $lowerBreakpoint = ($bpValue - 1) . 'px';
 

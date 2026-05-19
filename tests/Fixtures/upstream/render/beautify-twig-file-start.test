@@ -1,0 +1,30 @@
+--OPTIONS--
+beautify: true
+
+--MJML--
+<mjml>
+  <mj-raw position="file-start">
+{# subject: New submission from {{ form.name }} #}
+{# fromEmail: {{ craft.app.systemSettings.getSettings('email').fromEmail }} #}
+{# fromName: {{ craft.app.systemSettings.getSettings('email').fromName }} #}
+{# cc: #}
+{# bcc: #}
+{# includeAttachments: false #}
+{# presetAssets: #}
+{# description: New form submission - internal notification #}
+  </mj-raw>
+  <mj-body>
+    <!-- Your content goes here -->
+  </mj-body>
+</mjml>
+
+--HTML--
+{# subject: New submission from {{ form.name }} #}
+{# fromEmail: {{ craft.app.systemSettings.getSettings('email').fromEmail }} #}
+{# fromName: {{ craft.app.systemSettings.getSettings('email').fromName }} #}
+{# cc: #}
+{# bcc: #}
+{# includeAttachments: false #}
+{# presetAssets: #}
+{# description: New form submission - internal notification #}
+<!-- Your content goes here -->

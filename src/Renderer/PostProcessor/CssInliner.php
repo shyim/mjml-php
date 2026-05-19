@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Renderer\PostProcessor;
+namespace Mjml\Renderer\PostProcessor;
 
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 

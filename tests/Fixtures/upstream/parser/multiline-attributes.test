@@ -1,0 +1,23 @@
+--OPTIONS--
+validationLevel: skip
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text
+            padding-left="16px"
+
+            padding-right="16px">
+            <a href="https://www.test.com" style="color: #60788c">View blog ]]post</a>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+padding-right:16px;
+padding-left:16px;
+<a href="https://www.test.com" style="color: #60788c">View blog ]]post</a>

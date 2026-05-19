@@ -1,0 +1,23 @@
+--OPTIONS--
+beautify: true
+
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-raw>
+          <!-- htmlmin:ignore -->
+          <div>preserved content</div>
+          <!-- htmlmin:ignore -->
+        </mj-raw>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+preserved content
+
+--HTML-NOT--
+htmlmin:ignore

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Component\Data;
+namespace Mjml\Component\Data;
 
 final class SocialNetworks
 {

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Tests\Integration;
+namespace Mjml\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
-use Shyim\Mjml\Component\HeadComponent;
-use Shyim\Mjml\Mjml;
-use Shyim\Mjml\MjmlOptions;
-use Shyim\Mjml\Validation\ValidationLevel;
+use Mjml\Component\HeadComponent;
+use Mjml\Mjml;
+use Mjml\MjmlOptions;
+use Mjml\Validation\ValidationLevel;
 
 final class LazyHeadStyleTest extends TestCase
 {

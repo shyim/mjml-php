@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Shyim\Mjml\Validation;
+namespace Mjml\Validation;
 
-use Shyim\Mjml\Component\ComponentRegistry;
-use Shyim\Mjml\Parser\Node;
-use Shyim\Mjml\Validation\Rule\ValidAttributesRule;
-use Shyim\Mjml\Validation\Rule\ValidChildrenRule;
-use Shyim\Mjml\Validation\Rule\ValidTagRule;
-use Shyim\Mjml\Validation\Rule\ValidationRuleInterface;
-use Shyim\Mjml\Validation\Rule\ValidTypesRule;
+use Mjml\Component\ComponentRegistry;
+use Mjml\Parser\Node;
+use Mjml\Validation\Rule\ValidAttributesRule;
+use Mjml\Validation\Rule\ValidChildrenRule;
+use Mjml\Validation\Rule\ValidTagRule;
+use Mjml\Validation\Rule\ValidationRuleInterface;
+use Mjml\Validation\Rule\ValidTypesRule;
 
 final class Validator
 {

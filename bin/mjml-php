@@ -3,10 +3,10 @@
 
 declare(strict_types=1);
 
-use Shyim\Mjml\Mjml;
-use Shyim\Mjml\MjmlOptions;
-use Shyim\Mjml\Validation\ValidationException;
-use Shyim\Mjml\Validation\ValidationLevel;
+use Mjml\Mjml;
+use Mjml\MjmlOptions;
+use Mjml\Validation\ValidationException;
+use Mjml\Validation\ValidationLevel;
 
 $autoload = $_composer_autoload_path ?? null;
 
@@ -38,11 +38,14 @@ Usage:
 
 Options:
   -o, --output <file>           Write HTML to file instead of stdout
-      --validation-level <lvl>  strict|skip (default: strict)
+      --validation-level <lvl>  strict|soft|skip (default: strict)
       --skip-validation         Shortcut for --validation-level=skip
       --file-path <path>        Base file/directory for relative includes
       --process-includes        Process mj-include tags (default: ignored)
       --include-path <path>     Extra allowed include root; repeatable or comma-separated
+      --minify                  Minify HTML output
+      --beautify                Beautify HTML output
+      --no-comments             Strip HTML comments from output
       --lang <lang>             HTML language (default: und)
       --dir <dir>               Text direction (default: auto)
   -h, --help                    Show this help
@@ -107,6 +110,9 @@ $ignoreIncludes = true;
 $includePath = [];
 $lang = 'und';
 $dir = 'auto';
+$minify = false;
+$beautify = false;
+$keepComments = true;
 
 for ($i = 0, $count = count($args); $i < $count; $i++) {
     $arg = $args[$i];
@@ -208,6 +214,21 @@ for ($i = 0, $count = count($args); $i < $count; $i++) {
         continue;
     }
 
+    if ($arg === '--minify') {
+        $minify = true;
+        continue;
+    }
+
+    if ($arg === '--beautify') {
+        $beautify = true;
+        continue;
+    }
+
+    if ($arg === '--no-comments') {
+        $keepComments = false;
+        continue;
+    }
+
     if (str_starts_with($arg, '-')) {
         mjml_php_fail("Unknown option: {$arg}\nRun mjml-php --help for usage.");
     }
@@ -236,12 +257,15 @@ if ($input === null || $input === '-') {
 try {
     $validation = ValidationLevel::from($validationLevel);
 } catch (ValueError) {
-    mjml_php_fail("Invalid validation level: {$validationLevel}. Expected strict or skip.");
+    mjml_php_fail("Invalid validation level: {$validationLevel}. Expected strict, soft, or skip.");
 }
 
 try {
     $result = Mjml::render($mjml, new MjmlOptions(
         validationLevel: $validation,
+        minify: $minify,
+        beautify: $beautify,
+        keepComments: $keepComments,
         language: $lang,
         dir: $dir,
         filePath: $filePath,
