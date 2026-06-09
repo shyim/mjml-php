@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mjml;
+namespace MjmlPHP;
 
-use Mjml\Validation\ValidationLevel;
+use MjmlPHP\Validation\ValidationLevel;
 
 final readonly class MjmlOptions
 {

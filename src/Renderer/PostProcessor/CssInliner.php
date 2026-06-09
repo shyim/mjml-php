@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Renderer\PostProcessor;
+namespace MjmlPHP\Renderer\PostProcessor;
 
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 

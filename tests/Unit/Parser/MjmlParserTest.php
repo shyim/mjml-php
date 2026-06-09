@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Unit\Parser;
+namespace MjmlPHP\Tests\Unit\Parser;
 
 use PHPUnit\Framework\TestCase;
-use Mjml\Component\ComponentRegistry;
-use Mjml\MjmlOptions;
-use Mjml\Parser\MjmlParser;
-use Mjml\Validation\ValidationLevel;
+use MjmlPHP\Component\ComponentRegistry;
+use MjmlPHP\MjmlOptions;
+use MjmlPHP\Parser\MjmlParser;
+use MjmlPHP\Validation\ValidationLevel;
 
 final class MjmlParserTest extends TestCase
 {

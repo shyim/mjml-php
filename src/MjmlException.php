@@ -2,6 +2,6 @@
 
 declare(strict_types=1);
 
-namespace Mjml;
+namespace MjmlPHP;
 
 abstract class MjmlException extends \RuntimeException {}

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Hook;
+namespace MjmlPHP\Hook;
 
-use Mjml\Context\GlobalContext;
-use Mjml\Parser\Node;
+use MjmlPHP\Context\GlobalContext;
+use MjmlPHP\Parser\Node;
 
 /**
  * Extension hooks for the MJML rendering pipeline.

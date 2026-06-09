@@ -14,5 +14,5 @@ filePath: circular
 </mjml>
 
 --EXCEPTION--
-Mjml\Parser\ParseException
+MjmlPHP\Parser\ParseException
 Circular inclusion detected

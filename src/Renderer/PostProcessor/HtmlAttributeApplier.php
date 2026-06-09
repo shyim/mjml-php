@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Renderer\PostProcessor;
+namespace MjmlPHP\Renderer\PostProcessor;
 
 final class HtmlAttributeApplier
 {
@@ -36,7 +36,7 @@ final class HtmlAttributeApplier
 
         // Route libxml errors to internal buffer (HTML5 tags would otherwise
         // emit warnings). LIBXML_NONET prevents any network access for DTDs.
-        $libxml = new \Mjml\Parser\LibXmlErrorCollector();
+        $libxml = new \MjmlPHP\Parser\LibXmlErrorCollector();
         $libxml->start();
         $wrappedHtml = '<?xml encoding="UTF-8">' . $protected;
         $doc->loadHTML($wrappedHtml, \LIBXML_HTML_NOIMPLIED | \LIBXML_HTML_NODEFDTD | \LIBXML_NONET);

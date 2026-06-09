@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Integration;
+namespace MjmlPHP\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
-use Mjml\Mjml;
-use Mjml\MjmlOptions;
-use Mjml\Validation\ValidationLevel;
+use MjmlPHP\Mjml;
+use MjmlPHP\MjmlOptions;
+use MjmlPHP\Validation\ValidationLevel;
 
 abstract class AbstractIntegrationTest extends TestCase
 {

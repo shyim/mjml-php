@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Integration;
+namespace MjmlPHP\Tests\Integration;
 
 use PHPUnit\Framework\TestCase;
-use Mjml\Component\HeadComponent;
-use Mjml\Mjml;
-use Mjml\MjmlOptions;
-use Mjml\Validation\ValidationLevel;
+use MjmlPHP\Component\HeadComponent;
+use MjmlPHP\Mjml;
+use MjmlPHP\MjmlOptions;
+use MjmlPHP\Validation\ValidationLevel;
 
 final class LazyHeadStyleTest extends TestCase
 {

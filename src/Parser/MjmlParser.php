@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Parser;
+namespace MjmlPHP\Parser;
 
-use Mjml\Component\ComponentRegistry;
-use Mjml\MjmlOptions;
+use MjmlPHP\Component\ComponentRegistry;
+use MjmlPHP\MjmlOptions;
 
 final class MjmlParser
 {

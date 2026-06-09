@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Parser;
+namespace MjmlPHP\Parser;
 
 /**
  * Internal AST node used by the parser and renderer.

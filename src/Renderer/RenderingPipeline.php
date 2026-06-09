@@ -2,26 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Renderer;
+namespace MjmlPHP\Renderer;
 
-use Mjml\Cache\ArrayCache;
-use Mjml\Cache\NodeCacheInterface;
-use Mjml\Component\BodyComponent;
-use Mjml\Component\ComponentRegistry;
-use Mjml\Component\HeadComponent;
-use Mjml\Context\GlobalContext;
-use Mjml\Context\RenderContext;
-use Mjml\MjmlOptions;
-use Mjml\MjmlResult;
-use Mjml\Parser\MjmlParser;
-use Mjml\Parser\Node;
-use Mjml\Renderer\PostProcessor\CssInliner;
-use Mjml\Renderer\PostProcessor\HtmlAttributeApplier;
-use Mjml\Renderer\PostProcessor\OutlookConditionalMerger;
-use Mjml\Validation\ValidationException;
-use Mjml\Validation\ValidationLevel;
-use Mjml\Validation\Validator;
-use Mjml\Hook\PipelineHooks;
+use MjmlPHP\Cache\ArrayCache;
+use MjmlPHP\Cache\NodeCacheInterface;
+use MjmlPHP\Component\BodyComponent;
+use MjmlPHP\Component\ComponentRegistry;
+use MjmlPHP\Component\HeadComponent;
+use MjmlPHP\Context\GlobalContext;
+use MjmlPHP\Context\RenderContext;
+use MjmlPHP\MjmlOptions;
+use MjmlPHP\MjmlResult;
+use MjmlPHP\Parser\MjmlParser;
+use MjmlPHP\Parser\Node;
+use MjmlPHP\Renderer\PostProcessor\CssInliner;
+use MjmlPHP\Renderer\PostProcessor\HtmlAttributeApplier;
+use MjmlPHP\Renderer\PostProcessor\OutlookConditionalMerger;
+use MjmlPHP\Validation\ValidationException;
+use MjmlPHP\Validation\ValidationLevel;
+use MjmlPHP\Validation\Validator;
+use MjmlPHP\Hook\PipelineHooks;
 
 final class RenderingPipeline
 {
@@ -34,8 +34,8 @@ final class RenderingPipeline
     ) {}
 
     /**
-     * @throws \Mjml\Parser\ParseException
-     * @throws \Mjml\Validation\ValidationException
+     * @throws \MjmlPHP\Parser\ParseException
+     * @throws \MjmlPHP\Validation\ValidationException
      */
     public function execute(string $mjml): MjmlResult
     {

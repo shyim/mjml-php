@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Fixture;
+namespace MjmlPHP\Tests\Fixture;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Mjml\Mjml;
-use Mjml\Validation\ValidationException;
+use MjmlPHP\Mjml;
+use MjmlPHP\Validation\ValidationException;
 
 final class FixtureTest extends TestCase
 {

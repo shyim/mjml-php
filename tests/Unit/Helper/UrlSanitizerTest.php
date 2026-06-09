@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Unit\Helper;
+namespace MjmlPHP\Tests\Unit\Helper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Mjml\Helper\UrlSanitizer;
+use MjmlPHP\Helper\UrlSanitizer;
 
 final class UrlSanitizerTest extends TestCase
 {

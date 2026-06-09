@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Component;
+namespace MjmlPHP\Component;
 
-use Mjml\Context\RenderContext;
-use Mjml\Helper\CssParser;
-use Mjml\Helper\UrlSanitizer;
-use Mjml\Helper\WidthParser;
-use Mjml\Parser\Node;
+use MjmlPHP\Context\RenderContext;
+use MjmlPHP\Helper\CssParser;
+use MjmlPHP\Helper\UrlSanitizer;
+use MjmlPHP\Helper\WidthParser;
+use MjmlPHP\Parser\Node;
 
 abstract class BodyComponent extends AbstractComponent
 {

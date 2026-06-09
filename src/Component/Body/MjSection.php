@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Component\Body;
+namespace MjmlPHP\Component\Body;
 
-use Mjml\Component\BodyComponent;
-use Mjml\Context\RenderContext;
-use Mjml\Helper\BackgroundParser;
+use MjmlPHP\Component\BodyComponent;
+use MjmlPHP\Context\RenderContext;
+use MjmlPHP\Helper\BackgroundParser;
 
 class MjSection extends BodyComponent
 {

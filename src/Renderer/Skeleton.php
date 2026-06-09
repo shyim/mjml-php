@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Renderer;
+namespace MjmlPHP\Renderer;
 
-use Mjml\Context\GlobalContext;
-use Mjml\Helper\Fonts;
-use Mjml\MjmlOptions;
+use MjmlPHP\Context\GlobalContext;
+use MjmlPHP\Helper\Fonts;
+use MjmlPHP\MjmlOptions;
 
 final class Skeleton
 {

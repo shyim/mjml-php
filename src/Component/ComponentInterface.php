@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Component;
+namespace MjmlPHP\Component;
 
 interface ComponentInterface
 {

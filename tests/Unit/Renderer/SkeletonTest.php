@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Unit\Renderer;
+namespace MjmlPHP\Tests\Unit\Renderer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Mjml\Context\GlobalContext;
-use Mjml\MjmlOptions;
-use Mjml\Renderer\Skeleton;
+use MjmlPHP\Context\GlobalContext;
+use MjmlPHP\MjmlOptions;
+use MjmlPHP\Renderer\Skeleton;
 
 final class SkeletonTest extends TestCase
 {

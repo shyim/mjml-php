@@ -21,7 +21,7 @@ composer require shyim/mjml-php
 ### Basic
 
 ```php
-use Mjml\Mjml;
+use MjmlPHP\Mjml;
 
 $result = Mjml::render('<mjml>
   <mj-body>
@@ -39,8 +39,8 @@ echo $result->html;
 ### With Options
 
 ```php
-use Mjml\Mjml;
-use Mjml\MjmlOptions;
+use MjmlPHP\Mjml;
+use MjmlPHP\MjmlOptions;
 
 $result = Mjml::render($mjml, new MjmlOptions(
     keepComments: true,
@@ -56,7 +56,7 @@ echo $result->html;
 ### Custom Components
 
 ```php
-use Mjml\Mjml;
+use MjmlPHP\Mjml;
 
 $mjml = new Mjml();
 $mjml->registerComponent(MyCustomComponent::class);
@@ -121,8 +121,8 @@ Run `vendor/bin/mjml-php --help` for all options.
 MJML-PHP validates your markup and throws a `ValidationException` on errors:
 
 ```php
-use Mjml\Validation\ValidationException;
-use Mjml\Validation\ValidationLevel;
+use MjmlPHP\Validation\ValidationException;
+use MjmlPHP\Validation\ValidationLevel;
 
 try {
     $result = Mjml::render($mjml);
@@ -151,12 +151,12 @@ foreach ($result->errors as $error) {
 
 ## Exception Model
 
-All library exceptions extend `Mjml\MjmlException`, so you can catch them with a single `catch`:
+All library exceptions extend `MjmlPHP\MjmlException`, so you can catch them with a single `catch`:
 
 ```php
-use Mjml\MjmlException;
-use Mjml\Parser\ParseException;
-use Mjml\Validation\ValidationException;
+use MjmlPHP\MjmlException;
+use MjmlPHP\Parser\ParseException;
+use MjmlPHP\Validation\ValidationException;
 
 try {
     $result = Mjml::render($mjml);
@@ -235,7 +235,7 @@ Unexpected raw multi-line HTML fragment
 Expected validation error fragment
 
 --EXCEPTION--
-Mjml\Parser\ParseException
+MjmlPHP\Parser\ParseException
 Expected exception message fragment
 ```
 

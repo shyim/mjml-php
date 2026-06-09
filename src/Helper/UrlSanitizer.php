@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Helper;
+namespace MjmlPHP\Helper;
 
 /**
  * Defensive URL-scheme allowlist for attributes that end up in browser-rendered

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Component\Body;
+namespace MjmlPHP\Component\Body;
 
-use Mjml\Component\BodyComponent;
+use MjmlPHP\Component\BodyComponent;
 
 final class MjNavbarLink extends BodyComponent
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Cache;
+namespace MjmlPHP\Cache;
 
-use Mjml\Parser\Node;
+use MjmlPHP\Parser\Node;
 
 /**
  * Optional cache interface for parsed MJML Node trees.

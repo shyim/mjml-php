@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Integration;
+namespace MjmlPHP\Tests\Integration;
 
 final class HtmlAttributesTest extends AbstractIntegrationTest
 {

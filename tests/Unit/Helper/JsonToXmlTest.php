@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Unit\Helper;
+namespace MjmlPHP\Tests\Unit\Helper;
 
 use PHPUnit\Framework\TestCase;
-use Mjml\Helper\JsonToXml;
-use Mjml\Parser\Node;
+use MjmlPHP\Helper\JsonToXml;
+use MjmlPHP\Parser\Node;
 
 final class JsonToXmlTest extends TestCase
 {

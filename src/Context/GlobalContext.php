@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Context;
+namespace MjmlPHP\Context;
 
 /**
  * Mutable context bag that accumulates head-component output during the

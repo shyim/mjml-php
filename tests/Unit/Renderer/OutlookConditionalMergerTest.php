@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Unit\Renderer;
+namespace MjmlPHP\Tests\Unit\Renderer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Mjml\Renderer\PostProcessor\OutlookConditionalMerger;
+use MjmlPHP\Renderer\PostProcessor\OutlookConditionalMerger;
 
 final class OutlookConditionalMergerTest extends TestCase
 {

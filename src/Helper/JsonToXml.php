@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Helper;
+namespace MjmlPHP\Helper;
 
-use Mjml\Parser\Node;
+use MjmlPHP\Parser\Node;
 
 final class JsonToXml
 {

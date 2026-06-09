@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Unit\Cli;
+namespace MjmlPHP\Tests\Unit\Cli;
 
 use PHPUnit\Framework\TestCase;
 

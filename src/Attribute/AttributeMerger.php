@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Attribute;
+namespace MjmlPHP\Attribute;
 
 /**
  * Merges explicit, default, global, and mj-class attribute values in priority order.

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Component\Data;
+namespace MjmlPHP\Component\Data;
 
 final class SocialNetworks
 {

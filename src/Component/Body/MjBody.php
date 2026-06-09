@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Component\Body;
+namespace MjmlPHP\Component\Body;
 
-use Mjml\Component\BodyComponent;
-use Mjml\Context\RenderContext;
+use MjmlPHP\Component\BodyComponent;
+use MjmlPHP\Context\RenderContext;
 
 final class MjBody extends BodyComponent
 {

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Parser;
+namespace MjmlPHP\Parser;
 
-use Mjml\MjmlException;
+use MjmlPHP\MjmlException;
 
 final class ParseException extends MjmlException {}

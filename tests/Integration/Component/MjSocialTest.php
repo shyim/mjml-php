@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Integration\Component;
+namespace MjmlPHP\Tests\Integration\Component;
 
-use Mjml\Tests\Integration\AbstractIntegrationTest;
+use MjmlPHP\Tests\Integration\AbstractIntegrationTest;
 
 class MjSocialTest extends AbstractIntegrationTest
 {

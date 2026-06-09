@@ -3,10 +3,10 @@
 
 declare(strict_types=1);
 
-use Mjml\Mjml;
-use Mjml\MjmlOptions;
-use Mjml\Validation\ValidationException;
-use Mjml\Validation\ValidationLevel;
+use MjmlPHP\Mjml;
+use MjmlPHP\MjmlOptions;
+use MjmlPHP\Validation\ValidationException;
+use MjmlPHP\Validation\ValidationLevel;
 
 $autoload = $_composer_autoload_path ?? null;
 

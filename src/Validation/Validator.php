@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Validation;
+namespace MjmlPHP\Validation;
 
-use Mjml\Component\ComponentRegistry;
-use Mjml\Parser\Node;
-use Mjml\Validation\Rule\ValidAttributesRule;
-use Mjml\Validation\Rule\ValidChildrenRule;
-use Mjml\Validation\Rule\ValidTagRule;
-use Mjml\Validation\Rule\ValidationRuleInterface;
-use Mjml\Validation\Rule\ValidTypesRule;
+use MjmlPHP\Component\ComponentRegistry;
+use MjmlPHP\Parser\Node;
+use MjmlPHP\Validation\Rule\ValidAttributesRule;
+use MjmlPHP\Validation\Rule\ValidChildrenRule;
+use MjmlPHP\Validation\Rule\ValidTagRule;
+use MjmlPHP\Validation\Rule\ValidationRuleInterface;
+use MjmlPHP\Validation\Rule\ValidTypesRule;
 
 final class Validator
 {

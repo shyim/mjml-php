@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Parser;
+namespace MjmlPHP\Parser;
 
 /**
  * Collects and stores libxml parse errors for inspection.

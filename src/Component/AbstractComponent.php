@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Component;
+namespace MjmlPHP\Component;
 
-use Mjml\Attribute\AttributeMerger;
-use Mjml\Context\GlobalContext;
-use Mjml\Context\RenderContext;
-use Mjml\Parser\MjmlParser;
-use Mjml\Parser\Node;
+use MjmlPHP\Attribute\AttributeMerger;
+use MjmlPHP\Context\GlobalContext;
+use MjmlPHP\Context\RenderContext;
+use MjmlPHP\Parser\MjmlParser;
+use MjmlPHP\Parser\Node;
 
 abstract class AbstractComponent implements ComponentInterface
 {

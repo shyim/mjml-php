@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Unit\Helper;
+namespace MjmlPHP\Tests\Unit\Helper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Mjml\Helper\CssParser;
+use MjmlPHP\Helper\CssParser;
 
 final class CssParserTest extends TestCase
 {

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Validation\Rule;
+namespace MjmlPHP\Validation\Rule;
 
-use Mjml\Component\ComponentRegistry;
-use Mjml\Parser\Node;
-use Mjml\Validation\ValidationError;
+use MjmlPHP\Component\ComponentRegistry;
+use MjmlPHP\Parser\Node;
+use MjmlPHP\Validation\ValidationError;
 
 /**
  * Validates that attribute values match their declared types (color, unit, enum, etc.).

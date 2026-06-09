@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Component\Body;
+namespace MjmlPHP\Component\Body;
 
-use Mjml\Component\BodyComponent;
-use Mjml\Component\Data\SocialNetworks;
+use MjmlPHP\Component\BodyComponent;
+use MjmlPHP\Component\Data\SocialNetworks;
 
 final class MjSocialElement extends BodyComponent
 {

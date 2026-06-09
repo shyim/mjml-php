@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Tests\Fixture;
+namespace MjmlPHP\Tests\Fixture;
 
-use Mjml\MjmlOptions;
-use Mjml\Validation\ValidationLevel;
+use MjmlPHP\MjmlOptions;
+use MjmlPHP\Validation\ValidationLevel;
 
 final readonly class FixtureFile
 {

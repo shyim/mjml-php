@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Validation;
+namespace MjmlPHP\Validation;
 
 final readonly class ValidationError
 {

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Mjml;
+namespace MjmlPHP;
 
-use Mjml\Cache\NodeCacheInterface;
-use Mjml\Component\ComponentRegistry;
-use Mjml\Hook\PipelineHooks;
-use Mjml\Renderer\RenderingPipeline;
+use MjmlPHP\Cache\NodeCacheInterface;
+use MjmlPHP\Component\ComponentRegistry;
+use MjmlPHP\Hook\PipelineHooks;
+use MjmlPHP\Renderer\RenderingPipeline;
 
 final class Mjml
 {
@@ -30,7 +30,7 @@ final class Mjml
     /**
      * Register a custom component class.
      *
-     * @param class-string<\Mjml\Component\ComponentInterface> $componentClass
+     * @param class-string<\MjmlPHP\Component\ComponentInterface> $componentClass
      */
     public function registerComponent(string $componentClass): self
     {
@@ -52,8 +52,8 @@ final class Mjml
     /**
      * Render MJML string to HTML.
      *
-     * @throws \Mjml\Parser\ParseException If the MJML markup is malformed.
-     * @throws \Mjml\Validation\ValidationException If validation fails in Strict mode.
+     * @throws \MjmlPHP\Parser\ParseException If the MJML markup is malformed.
+     * @throws \MjmlPHP\Validation\ValidationException If validation fails in Strict mode.
      */
     public function toHtml(string $mjml): MjmlResult
     {
@@ -65,11 +65,11 @@ final class Mjml
     /**
      * Static convenience method to render MJML to HTML.
      *
-     * @param list<class-string<\Mjml\Component\ComponentInterface>> $components
+     * @param list<class-string<\MjmlPHP\Component\ComponentInterface>> $components
      *        Optional extra component classes to register before rendering.
      *
-     * @throws \Mjml\Parser\ParseException If the MJML markup is malformed.
-     * @throws \Mjml\Validation\ValidationException If validation fails in Strict mode.
+     * @throws \MjmlPHP\Parser\ParseException If the MJML markup is malformed.
+     * @throws \MjmlPHP\Validation\ValidationException If validation fails in Strict mode.
      */
     public static function render(string $mjml, ?MjmlOptions $options = null, array $components = []): MjmlResult
     {

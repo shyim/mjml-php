@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Component\Body;
+namespace MjmlPHP\Component\Body;
 
-use Mjml\Component\BodyComponent;
+use MjmlPHP\Component\BodyComponent;
 
 final class MjAccordionElement extends BodyComponent
 {
@@ -112,7 +112,7 @@ final class MjAccordionElement extends BodyComponent
      */
     private function createChildComponent(string $componentClass, array $attributes): BodyComponent
     {
-        $node = new \Mjml\Parser\Node(
+        $node = new \MjmlPHP\Parser\Node(
             tagName: $componentClass::getComponentName(),
             attributes: $attributes,
         );

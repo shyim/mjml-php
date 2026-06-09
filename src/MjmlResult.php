@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Mjml;
+namespace MjmlPHP;
 
-use Mjml\Parser\Node;
-use Mjml\Validation\ValidationError;
+use MjmlPHP\Parser\Node;
+use MjmlPHP\Validation\ValidationError;
 
 final readonly class MjmlResult
 {

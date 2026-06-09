@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Mjml\Component\Body;
+namespace MjmlPHP\Component\Body;
 
-use Mjml\Component\BodyComponent;
-use Mjml\Context\RenderContext;
-use Mjml\Helper\WidthParser;
+use MjmlPHP\Component\BodyComponent;
+use MjmlPHP\Context\RenderContext;
+use MjmlPHP\Helper\WidthParser;
 
 final class MjGroup extends BodyComponent
 {
