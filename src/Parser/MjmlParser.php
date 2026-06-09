@@ -43,7 +43,7 @@ final class MjmlParser
             } elseif (is_file($filePath)) {
                 $this->cwd = dirname(realpath($filePath) ?: $filePath);
             } else {
-                $this->cwd = getcwd() ?: '.';
+                $this->cwd = $this->directoryForUnresolvedPath($filePath);
             }
         } else {
             $this->cwd = getcwd() ?: '.';
@@ -431,10 +431,75 @@ final class MjmlParser
             $resolved = realpath($currentFile);
             if ($resolved !== false) {
                 $base = is_dir($resolved) ? $resolved : dirname($resolved);
+            } else {
+                $base = $this->directoryForUnresolvedPath($currentFile);
             }
         }
 
-        return rtrim($base, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path);
+        return $this->normalizePath(rtrim($base, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path));
+    }
+
+    /**
+     * Lexically normalize a path without requiring every intermediate segment
+     * to exist. realpath() cannot resolve paths that pass through a virtual
+     * include root (for example "root/templates/../../common/header.mjml"),
+     * but those paths still need to be checked against includePath roots.
+     */
+    private function normalizePath(string $path): string
+    {
+        $path = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path);
+        $isAbsolute = str_starts_with($path, DIRECTORY_SEPARATOR);
+        $segments = [];
+
+        foreach (explode(DIRECTORY_SEPARATOR, $path) as $segment) {
+            if ($segment === '' || $segment === '.') {
+                continue;
+            }
+
+            if ($segment === '..') {
+                if ($segments !== [] && end($segments) !== '..') {
+                    array_pop($segments);
+                    continue;
+                }
+
+                if (!$isAbsolute) {
+                    $segments[] = $segment;
+                }
+
+                continue;
+            }
+
+            $segments[] = $segment;
+        }
+
+        $normalized = implode(DIRECTORY_SEPARATOR, $segments);
+
+        if ($isAbsolute) {
+            return DIRECTORY_SEPARATOR . $normalized;
+        }
+
+        return $normalized === '' ? '.' : $normalized;
+    }
+
+    /**
+     * Determine the include base directory for a path that may not exist yet.
+     *
+     * The JS MJML API accepts filePath as either a directory-like root or a
+     * concrete file path. In tests imported from upstream, values such as
+     * "root" are virtual directories that do not exist on disk but still
+     * define the sandbox root for resolving includes.
+     */
+    private function directoryForUnresolvedPath(string $path): string
+    {
+        $normalized = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $path);
+
+        if (str_ends_with($normalized, DIRECTORY_SEPARATOR) || pathinfo($normalized, PATHINFO_EXTENSION) === '') {
+            return rtrim($normalized, DIRECTORY_SEPARATOR);
+        }
+
+        $directory = dirname($normalized);
+
+        return $directory === '' ? '.' : $directory;
     }
 
     /**
