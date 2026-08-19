@@ -17,6 +17,7 @@ final class MjSocial extends BodyComponent
     {
         return [
             'align' => 'enum(left,right,center)',
+            'border' => 'string',
             'border-radius' => 'string',
             'container-background-color' => 'color',
             'color' => 'color',
@@ -80,7 +81,7 @@ final class MjSocial extends BodyComponent
         }
 
         foreach ([
-            'border-radius', 'color', 'font-family', 'font-size',
+            'border', 'border-radius', 'color', 'font-family', 'font-size',
             'font-weight', 'font-style', 'icon-size', 'icon-height',
             'icon-padding', 'text-padding', 'line-height', 'text-decoration',
         ] as $attr) {

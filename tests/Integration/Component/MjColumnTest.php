@@ -74,6 +74,12 @@ final class MjColumnTest extends AbstractIntegrationTest
 
         $wideNodes = $this->querySelectorAll($html, 'div.mj-column-per-66-67');
         self::assertSame(1, $wideNodes->length, 'Wide column should have mj-column-per-66-67 class');
+
+        // MJML 5.4.0 rounds Outlook pixel widths (600 * 33.33% = 199.98 → 200)
+        self::assertStringContainsString('width:200px;', $html);
+        self::assertStringContainsString('width:400px;', $html);
+        self::assertStringNotContainsString('width:199.98px;', $html);
+        self::assertStringNotContainsString('width:400.02px;', $html);
     }
 
     public function testVerticalAlignIsApplied(): void

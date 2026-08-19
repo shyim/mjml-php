@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MjmlPHP\Tests\Integration\Component;
 
+use MjmlPHP\Mjml;
 use MjmlPHP\Tests\Integration\AbstractIntegrationTest;
 
 final class MjSectionTest extends AbstractIntegrationTest
@@ -127,5 +128,49 @@ final class MjSectionTest extends AbstractIntegrationTest
 
         $nodes = $this->querySelectorAll($html, 'div.my-section');
         self::assertGreaterThan(0, $nodes->length, 'css-class "my-section" should be applied to the div');
+    }
+
+    public function testGutterReducesDesktopColumnWidthAndAddsSidePadding(): void
+    {
+        $html = $this->renderMjml('<mjml><mj-body><mj-section gutter="20px"><mj-column><mj-text>A</mj-text></mj-column><mj-column><mj-text>B</mj-text></mj-column></mj-section></mj-body></mjml>');
+
+        $nodes = $this->querySelectorAll($html, 'div.mj-column-per-48-333333');
+        self::assertSame(2, $nodes->length);
+
+        self::assertStringContainsString('mj-column-gutter-2-1-per-3-333333', $html);
+        self::assertStringContainsString('mj-column-gutter-2-2-per-3-333333', $html);
+        self::assertStringContainsString('padding: 0% 1.666667% 0% 0% !important;', $html);
+        self::assertStringContainsString('padding: 0% 0% 0% 1.666667% !important;', $html);
+        self::assertStringContainsString('width:300px;padding:0px 10px 0px 0px;', $html);
+        self::assertStringContainsString('width:300px;padding:0px 0px 0px 10px;', $html);
+    }
+
+    public function testRtlGutterReversesHorizontalPadding(): void
+    {
+        $html = $this->renderMjml('<mjml><mj-body><mj-section gutter="20px" direction="rtl"><mj-column><mj-text>A</mj-text></mj-column><mj-column><mj-text>B</mj-text></mj-column></mj-section></mj-body></mjml>');
+
+        self::assertStringContainsString('mj-column-gutter-2-1-per-3-333333-rtl', $html);
+        self::assertStringContainsString('padding: 0% 0% 0% 1.666667% !important;', $html);
+        self::assertStringContainsString('width:300px;padding:0px 0px 0px 10px;', $html);
+    }
+
+    public function testPercentGutterAndGroupInlineDesktopPadding(): void
+    {
+        $percent = $this->renderMjml('<mjml><mj-body><mj-section gutter="5%"><mj-column><mj-text>A</mj-text></mj-column><mj-column><mj-text>B</mj-text></mj-column></mj-section></mj-body></mjml>');
+        self::assertStringContainsString('mj-column-per-47-5', $percent);
+        self::assertStringContainsString('mj-column-gutter-2-1-per-5', $percent);
+        self::assertStringContainsString('width:300px;padding:0px 15px 0px 0px;', $percent);
+
+        $group = $this->renderMjml('<mjml><mj-body><mj-section gutter="20px"><mj-group><mj-column><mj-text>A</mj-text></mj-column><mj-column><mj-text>B</mj-text></mj-column></mj-group></mj-section></mj-body></mjml>');
+        self::assertStringContainsString('width:48.333333%;padding:0% 1.666667% 0% 0%;', $group);
+        self::assertStringNotContainsString('mj-column-gutter-2-1-per-3-333333 {', $group);
+    }
+
+    public function testGutterIsAllowedUnderStrictValidation(): void
+    {
+        $result = Mjml::render('<mjml><mj-body><mj-section gutter="20px"><mj-column><mj-text>A</mj-text></mj-column><mj-column><mj-text>B</mj-text></mj-column></mj-section></mj-body></mjml>');
+
+        self::assertSame([], $result->errors);
+        self::assertStringContainsString('mj-column-gutter-2-1-per-3-333333', $result->html);
     }
 }

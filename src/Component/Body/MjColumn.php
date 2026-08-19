@@ -118,19 +118,19 @@ final class MjColumn extends BodyComponent
         }
 
         return [
-            'div' => [
+            'div' => array_merge([
                 'font-size' => '0px',
                 'text-align' => 'left',
                 'direction' => $this->getAttribute('direction'),
                 'display' => 'inline-block',
                 'vertical-align' => $this->getAttribute('vertical-align'),
                 'width' => $this->getMobileWidth(),
-            ],
+            ], $this->getMobileGutterStyles()),
             'table' => $tableInnerStyle,
-            'tdOutlook' => [
+            'tdOutlook' => array_merge([
                 'vertical-align' => $this->getAttribute('vertical-align'),
                 'width' => $this->getWidthAsPixel(),
-            ],
+            ], $this->getOutlookGutterStyles()),
             'gutter' => array_merge($tableStyle, [
                 'padding' => $this->getAttribute('padding'),
                 'padding-top' => $this->getAttribute('padding-top'),
@@ -154,6 +154,17 @@ final class MjColumn extends BodyComponent
             return '100%';
         }
 
+        if ($this->renderContext->isInGroup && $this->hasColumnGutter()) {
+            $desktop = $this->getDesktopWidth();
+            if ($desktop['unit'] === '%') {
+                return self::formatUnitValue($desktop['parsedWidth']) . '%';
+            }
+
+            $percent = $desktop['parsedWidth'] / max((int) ((float) $containerWidth), 1) * 100;
+
+            return self::formatUnitValue($percent) . '%';
+        }
+
         if ($width === null) {
             $val = 100 / max($nonRawSiblings, 1);
             return rtrim(rtrim(number_format($val, 2, '.', ''), '0'), '.') . '%';
@@ -175,10 +186,16 @@ final class MjColumn extends BodyComponent
         $parsed = WidthParser::parse($this->getParsedWidthString(), parseFloatToInt: false);
 
         if ($parsed['unit'] === '%') {
-            return ((float) $containerWidth * $parsed['value'] / 100) . 'px';
+            return self::normalizePxValue((float) $containerWidth * $parsed['value'] / 100) . 'px';
         }
 
-        return $parsed['value'] . 'px';
+        return self::normalizePxValue($parsed['value']) . 'px';
+    }
+
+    /** Round to the nearest CSS pixel, matching MJML 5.4.0. */
+    private static function normalizePxValue(float $value): int
+    {
+        return (int) round($value);
     }
 
     private function getParsedWidthString(): string
@@ -217,28 +234,257 @@ final class MjColumn extends BodyComponent
 
     private function getColumnClass(): string
     {
-        $parsed = $this->getParsedWidth();
-        $formattedClassNb = str_replace('.', '-', (string) $parsed['parsedWidth']);
+        $parsed = $this->hasColumnGutter()
+            ? $this->getDesktopWidth()
+            : $this->getParsedWidth();
+
+        $parsedWidth = $parsed['unit'] === 'px'
+            ? self::normalizePxValue($parsed['parsedWidth'])
+            : $parsed['parsedWidth'];
+        $widthToken = $parsed['unit'] === 'px'
+            ? (string) $parsedWidth
+            : self::formatUnitValue((float) $parsedWidth);
+        $formattedClassNb = str_replace('.', '-', $widthToken);
 
         $className = match ($parsed['unit']) {
             '%' => "mj-column-per-{$formattedClassNb}",
             default => "mj-column-px-{$formattedClassNb}",
         };
 
-        // Add className to media queries
-        if ($parsed['unit'] === '%') {
+        $this->addWidthMediaQuery($className, $widthToken, $parsed['unit']);
+
+        if ($this->hasColumnGutter() && !$this->renderContext->isInGroup) {
             $this->globalContext->addMediaQuery(
-                $className,
-                "{ width: {$parsed['parsedWidth']}% !important; max-width: {$parsed['parsedWidth']}%; }",
-            );
-        } else {
-            $this->globalContext->addMediaQuery(
-                $className,
-                "{ width: {$parsed['parsedWidth']}px !important; max-width: {$parsed['parsedWidth']}px; }",
+                $this->getDesktopGutterClassName(),
+                '{ padding: ' . $this->getDesktopPadding() . ' !important; }',
             );
         }
 
         return $className;
+    }
+
+    private function addWidthMediaQuery(string $className, string $parsedWidth, string $unit): void
+    {
+        $this->globalContext->addMediaQuery(
+            $className,
+            "{ width: {$parsedWidth}{$unit} !important; max-width: {$parsedWidth}{$unit}; }",
+        );
+    }
+
+    /**
+     * @return array{unit: string, parsedWidth: float}
+     */
+    private function getDesktopWidth(): array
+    {
+        $parsed = $this->getParsedWidth();
+        $unit = $parsed['unit'];
+        $parsedWidth = $parsed['parsedWidth'];
+
+        if (!$this->hasColumnGutter()) {
+            return [
+                'parsedWidth' => $unit === 'px' ? (float) self::normalizePxValue($parsedWidth) : $parsedWidth,
+                'unit' => $unit,
+            ];
+        }
+
+        $sibling = max($this->renderContext->sibling, 1);
+        $gutter = $this->getNormalizedGutterValue($unit);
+        $reduction = ($gutter * ($sibling - 1)) / $sibling;
+        $reducedWidth = max(0.0, self::normalizeUnitValue($parsedWidth - $reduction));
+
+        if ($unit === 'px') {
+            $floorWidth = (int) floor($reducedWidth);
+            $fractional = $reducedWidth - $floorWidth;
+            $extraPixels = max(0, min($sibling, (int) round($sibling * $fractional)));
+
+            return [
+                'parsedWidth' => (float) ($floorWidth + ($this->renderContext->index < $extraPixels ? 1 : 0)),
+                'unit' => $unit,
+            ];
+        }
+
+        return [
+            'parsedWidth' => $reducedWidth,
+            'unit' => $unit,
+        ];
+    }
+
+    private function getDesktopGutterClassName(): string
+    {
+        $gutterUnit = $this->getParsedWidth()['unit'];
+        $gutter = $this->getNormalizedGutterValue($gutterUnit);
+        $gutterUnitToken = $gutterUnit === '%' ? 'per' : $gutterUnit;
+        $directionToken = $this->renderContext->direction === 'rtl' ? '-rtl' : '';
+        $normalizedGutter = $gutterUnit === 'px'
+            ? self::normalizePxValue($gutter)
+            : $gutter;
+        $gutterToken = str_replace('.', '-', self::formatUnitValue((float) $normalizedGutter));
+        $sibling = max($this->renderContext->sibling, 1);
+        $position = $this->renderContext->index + 1;
+
+        return "mj-column-gutter-{$sibling}-{$position}-{$gutterUnitToken}-{$gutterToken}{$directionToken}";
+    }
+
+    private function getNormalizedGutterValue(string $targetUnit): float
+    {
+        $gutter = $this->renderContext->gutter;
+        if ($gutter === null || $gutter === '') {
+            return 0.0;
+        }
+
+        $parsed = WidthParser::parse($gutter, parseFloatToInt: false);
+        if ($parsed['unit'] === $targetUnit) {
+            return $parsed['value'];
+        }
+
+        $containerWidth = (float) $this->renderContext->containerWidth;
+
+        if ($targetUnit === '%' && $parsed['unit'] === 'px') {
+            return ($parsed['value'] / max($containerWidth, 1.0)) * 100;
+        }
+
+        if ($targetUnit === 'px' && $parsed['unit'] === '%') {
+            return $containerWidth * $parsed['value'] / 100;
+        }
+
+        return $parsed['value'];
+    }
+
+    /**
+     * @return array{top: float, right: float, bottom: float, left: float}
+     */
+    private function getDesktopPaddingValues(string $unit): array
+    {
+        $zeros = ['top' => 0.0, 'right' => 0.0, 'bottom' => 0.0, 'left' => 0.0];
+        $sibling = $this->renderContext->sibling;
+        if ($sibling <= 1) {
+            return $zeros;
+        }
+
+        $gutter = $this->getNormalizedGutterValue($unit);
+        $normalizedGutter = $unit === 'px' ? (float) self::normalizePxValue($gutter) : $gutter;
+        $halfLeading = $unit === 'px' ? ceil($normalizedGutter / 2) : $normalizedGutter / 2;
+        $halfTrailing = $unit === 'px' ? floor($normalizedGutter / 2) : $normalizedGutter / 2;
+        $isRtl = $this->renderContext->direction === 'rtl';
+        $first = $this->renderContext->first;
+        $last = $this->renderContext->last;
+
+        if ($isRtl) {
+            return [
+                'top' => 0.0,
+                'right' => $first ? 0.0 : $halfTrailing,
+                'bottom' => 0.0,
+                'left' => $last ? 0.0 : $halfLeading,
+            ];
+        }
+
+        return [
+            'top' => 0.0,
+            'right' => $last ? 0.0 : $halfLeading,
+            'bottom' => 0.0,
+            'left' => $first ? 0.0 : $halfTrailing,
+        ];
+    }
+
+    /**
+     * @return array{top: float, right: float, bottom: float, left: float}
+     */
+    private function getMobilePaddingValues(): array
+    {
+        $gutter = $this->getNormalizedGutterValue('%');
+        $half = $gutter / 2;
+
+        return [
+            'top' => $this->renderContext->first ? 0.0 : $half,
+            'right' => 0.0,
+            'bottom' => $this->renderContext->last ? 0.0 : $half,
+            'left' => 0.0,
+        ];
+    }
+
+    private static function formatPadding(float $top, float $right, float $bottom, float $left, string $unit): string
+    {
+        if ($unit === 'px') {
+            return self::normalizePxValue($top) . 'px '
+                . self::normalizePxValue($right) . 'px '
+                . self::normalizePxValue($bottom) . 'px '
+                . self::normalizePxValue($left) . 'px';
+        }
+
+        return self::formatUnitValue($top) . $unit . ' '
+            . self::formatUnitValue($right) . $unit . ' '
+            . self::formatUnitValue($bottom) . $unit . ' '
+            . self::formatUnitValue($left) . $unit;
+    }
+
+    private function getDesktopPadding(): string
+    {
+        $unit = $this->getParsedWidth()['unit'];
+        $values = $this->getDesktopPaddingValues($unit);
+
+        return self::formatPadding($values['top'], $values['right'], $values['bottom'], $values['left'], $unit);
+    }
+
+    private function getMobilePadding(): string
+    {
+        $values = $this->getMobilePaddingValues();
+
+        return self::formatPadding($values['top'], $values['right'], $values['bottom'], $values['left'], '%');
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getMobileGutterStyles(): array
+    {
+        if (!$this->hasColumnGutter()) {
+            return [];
+        }
+
+        if ($this->renderContext->isInGroup) {
+            return ['padding' => $this->getDesktopPadding()];
+        }
+
+        return ['padding' => $this->getMobilePadding()];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getOutlookGutterStyles(): array
+    {
+        if (!$this->hasColumnGutter()) {
+            return [];
+        }
+
+        $values = $this->getDesktopPaddingValues('px');
+
+        return [
+            'padding' => self::formatPadding($values['top'], $values['right'], $values['bottom'], $values['left'], 'px'),
+        ];
+    }
+
+    private function hasColumnGutter(): bool
+    {
+        $gutter = $this->renderContext->gutter;
+
+        return $gutter !== null && $gutter !== '';
+    }
+
+    /** Match MJML 5.4.0 `Number(parseFloat(value).toFixed(6))`. */
+    private static function normalizeUnitValue(float $value): float
+    {
+        return (float) number_format($value, 6, '.', '');
+    }
+
+    private static function formatUnitValue(float $value): string
+    {
+        $formatted = number_format($value, 6, '.', '');
+        if (str_contains($formatted, '.')) {
+            $formatted = rtrim(rtrim($formatted, '0'), '.');
+        }
+
+        return $formatted === '' ? '0' : $formatted;
     }
 
     private function hasBorderRadius(): bool
@@ -346,7 +592,13 @@ final class MjColumn extends BodyComponent
 
     public function render(): string
     {
-        $classesName = $this->getColumnClass() . ' mj-outlook-group-fix';
+        $classesName = $this->getColumnClass();
+
+        if ($this->hasColumnGutter()) {
+            $classesName .= ' ' . $this->getDesktopGutterClassName();
+        }
+
+        $classesName .= ' mj-outlook-group-fix';
 
         $cssClass = $this->getAttribute('css-class');
         if ($cssClass !== null) {

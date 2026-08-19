@@ -1,0 +1,30 @@
+<mjml>
+  <mj-body>
+    <mj-section gutter="20px">
+      <mj-column>
+        <mj-text>Left</mj-text>
+      </mj-column>
+      <mj-column>
+        <mj-text>Right</mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section gutter="5%">
+      <mj-column width="33.33%">
+        <mj-text>Third</mj-text>
+      </mj-column>
+      <mj-column width="66.67%">
+        <mj-text>Two Thirds</mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section gutter="20px">
+      <mj-group>
+        <mj-column>
+          <mj-text>Group A</mj-text>
+        </mj-column>
+        <mj-column>
+          <mj-text>Group B</mj-text>
+        </mj-column>
+      </mj-group>
+    </mj-section>
+  </mj-body>
+</mjml>

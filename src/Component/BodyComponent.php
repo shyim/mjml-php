@@ -217,6 +217,9 @@ abstract class BodyComponent extends AbstractComponent
                 nonRawSiblings: $nonRawSiblings,
                 sectionGap: $childContext->sectionGap,
                 columnGap: $childContext->columnGap,
+                gutter: $childContext->gutter,
+                direction: $childContext->direction,
+                isInGroup: $childContext->isInGroup,
             );
 
             /** @var BodyComponent $component */

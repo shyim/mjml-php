@@ -33,6 +33,7 @@ class MjSection extends BodyComponent
             'border-top' => 'string',
             'direction' => 'enum(ltr,rtl)',
             'full-width' => 'enum(full-width,false,)',
+            'gutter' => 'unit(px,%)',
             'padding' => 'unit(px,%){1,4}',
             'padding-top' => 'unit(px,%)',
             'padding-bottom' => 'unit(px,%)',
@@ -64,6 +65,8 @@ class MjSection extends BodyComponent
             containerWidth: $boxWidths['box'] . 'px',
             sectionGap: $this->renderContext->sectionGap,
             columnGap: $this->renderContext->columnGap,
+            gutter: $this->getAttribute('gutter'),
+            direction: $this->getAttribute('direction'),
         );
     }
 

@@ -15,6 +15,9 @@ final class RenderContext
         public readonly int $nonRawSiblings = 0,
         public readonly ?string $sectionGap = null,
         public readonly float $columnGap = 0,
+        public readonly ?string $gutter = null,
+        public readonly ?string $direction = null,
+        public readonly bool $isInGroup = false,
     ) {}
 
     public function withContainerWidth(string $containerWidth): self
@@ -28,6 +31,9 @@ final class RenderContext
             nonRawSiblings: $this->nonRawSiblings,
             sectionGap: $this->sectionGap,
             columnGap: $this->columnGap,
+            gutter: $this->gutter,
+            direction: $this->direction,
+            isInGroup: $this->isInGroup,
         );
     }
 }

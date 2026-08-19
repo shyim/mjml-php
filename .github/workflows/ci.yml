@@ -68,7 +68,7 @@ jobs:
         run: vendor/bin/phpunit
 
   snapshot-drift:
-    name: Snapshot Drift (vs. mjml@5.2.1)
+    name: Snapshot Drift (vs. mjml@5.4.0)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -80,7 +80,7 @@ jobs:
           node-version: '20'
 
       - name: Install MJML CLI
-        run: npm install -g mjml@5.2.1
+        run: npm install -g mjml@5.4.0
 
       - name: Re-render snapshot fixtures with reference MJML CLI
         run: |
@@ -93,7 +93,7 @@ jobs:
             generated="${tmpdir}/${base}.html"
             mjml "$f" --no-minify -o "$generated"
             if ! diff -u "$expected" "$generated"; then
-              echo "::error file=${expected}::snapshot drifted vs. mjml@5.2.1 — regenerate the fixture"
+              echo "::error file=${expected}::snapshot drifted vs. mjml@5.4.0 — regenerate the fixture"
               drift=1
             fi
           done

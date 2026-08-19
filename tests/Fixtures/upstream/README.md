@@ -34,6 +34,10 @@ Imported as fixture coverage:
 - `wrapper-gap.test.js`
 - parser XML cases from `test-values.js`: special characters, similar tags/order, self-closing tags, regex-timeout shape, multiline attributes, self-closing ending tags, include behavior, single-opening-tag ending content
 
+Added locally for MJML 5.4.0 features that are not in the 5.2.1 upstream suite:
+
+- `section-gutter.test`
+
 Covered by dedicated PHP tests instead of `.test` fixtures because they exercise internals or PHP-specific entry points:
 
 - `lazy-head-style.test.js` → `tests/Integration/LazyHeadStyleTest.php`

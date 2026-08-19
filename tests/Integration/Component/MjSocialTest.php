@@ -46,6 +46,22 @@ class MjSocialTest extends AbstractIntegrationTest
         self::assertGreaterThanOrEqual(2, $nodes->length, 'Expected multiple presentation tables for horizontal layout');
     }
 
+    public function testIconImagesDefaultToBorderZero(): void
+    {
+        $html = $this->renderMjml('<mjml><mj-body><mj-section><mj-column><mj-social><mj-social-element name="facebook" href="https://example.com">FB</mj-social-element></mj-social></mj-column></mj-section></mj-body></mjml>');
+
+        self::assertStringContainsString('style="border:0;border-radius:3px;display:block;"', $html);
+    }
+
+    public function testIconBorderCanBeSetOnElementAndInheritedFromParent(): void
+    {
+        $elementHtml = $this->renderMjml('<mjml><mj-body><mj-section><mj-column><mj-social><mj-social-element name="facebook" href="https://example.com" border="2px solid #111">FB</mj-social-element></mj-social></mj-column></mj-section></mj-body></mjml>');
+        self::assertStringContainsString('border:2px solid #111;', $elementHtml);
+
+        $parentHtml = $this->renderMjml('<mjml><mj-body><mj-section><mj-column><mj-social border="1px solid #f00"><mj-social-element name="facebook" href="https://example.com">FB</mj-social-element></mj-social></mj-column></mj-section></mj-body></mjml>');
+        self::assertStringContainsString('border:1px solid #f00;', $parentHtml);
+    }
+
     public function testVerticalModeUsesTrBasedLayout(): void
     {
         $html = $this->renderMjml('<mjml><mj-body><mj-section><mj-column><mj-social mode="vertical"><mj-social-element name="facebook" href="https://example.com">FB</mj-social-element><mj-social-element name="twitter" href="https://example.com">TW</mj-social-element></mj-social></mj-column></mj-section></mj-body></mjml>');
