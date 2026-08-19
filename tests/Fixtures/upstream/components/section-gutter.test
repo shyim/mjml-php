@@ -1,0 +1,18 @@
+--MJML--
+<mjml>
+  <mj-body>
+    <mj-section gutter="20px">
+      <mj-column><mj-text>Left</mj-text></mj-column>
+      <mj-column><mj-text>Right</mj-text></mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>
+
+--HTML--
+mj-column-per-48-333333
+mj-column-gutter-2-1-per-3-333333
+mj-column-gutter-2-2-per-3-333333
+padding: 0% 1.666667% 0% 0%
+padding: 0% 0% 0% 1.666667%
+Left
+Right

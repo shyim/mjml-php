@@ -9,12 +9,16 @@ All notable changes to this project will be documented in this file.
 - Extensibility hooks in `RenderingPipeline`
 - `--minify`, `--beautify`, `--keep-comments` CLI flags
 - `.editorconfig` for consistent contributor formatting
+- `border` attribute on `mj-social` / `mj-social-element` (MJML 5.4.0; default `0` on the icon image)
+- `gutter` attribute on `mj-section` (MJML 5.4.0; space between columns, including RTL, `%`/`px`, groups, and Outlook)
 
 ### Changed
 - Renamed `MjmlResult::$json` to `$ast` for clarity
 - Renamed `AttributeFormatter` to `AttributeMerger` (reflects actual purpose)
 - `GlobalContext` now uses private properties with setters
 - `ValidationLevel::Soft` now listed in CLI help text
+- Snapshot tests and compatibility target now MJML 5.4.0
+- Outlook column pixel widths are rounded to match MJML 5.4.0 (`33.33%` of 600px is `200px`, not `199.98px`)
 
 ### Fixed
 - libxml errors are now properly inspected and logged

@@ -86,8 +86,8 @@ Run `vendor/bin/mjml-php --help` for all options.
 
 ### Structure
 - `mj-body` — Email body container
-- `mj-section` — Horizontal section with background image/color support and Outlook VML
-- `mj-column` — Responsive column with auto-width distribution
+- `mj-section` — Horizontal section with background image/color support, Outlook VML, and column `gutter`
+- `mj-column` — Responsive column with auto-width distribution and section gutter spacing
 - `mj-group` — Non-responsive column grouping
 - `mj-wrapper` — Section wrapper with gap support
 
@@ -186,7 +186,7 @@ If you must interpolate user data into MJML, escape it yourself before passing i
 
 ## MJML Compatibility
 
-This is a native PHP port aligned with MJML 5.2.1. The HTML output is tested against the original JavaScript implementation using snapshot tests to ensure identical rendering. A CI job re-renders the snapshot fixtures with `mjml@5.2.1` and fails on drift, so if the upstream JS package publishes a patch you may see CI failures — open an issue and regenerate the fixtures.
+This is a native PHP port aligned with MJML 5.4.0. The HTML output is tested against the original JavaScript implementation using snapshot tests to ensure identical rendering. A CI job re-renders the snapshot fixtures with `mjml@5.4.0` and fails on drift, so if the upstream JS package publishes a patch you may see CI failures — open an issue and regenerate the fixtures.
 
 ## Limitations
 
@@ -255,7 +255,7 @@ The snapshot test fixtures compare PHP output against reference HTML generated b
 npm install -g mjml
 
 for f in tests/Snapshot/Fixtures/*.mjml; do
-    npx mjml@5.2.1 "$f" --no-minify > "${f%.mjml}.html"
+    npx mjml@5.4.0 "$f" --no-minify -o "${f%.mjml}.html"
 done
 ```
 

@@ -63,6 +63,9 @@ final class MjGroup extends BodyComponent
             nonRawSiblings: $childCount,
             sectionGap: $this->renderContext->sectionGap,
             columnGap: $this->renderContext->columnGap,
+            gutter: $this->renderContext->gutter,
+            direction: $this->getAttribute('direction'),
+            isInGroup: true,
         );
     }
 

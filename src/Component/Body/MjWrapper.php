@@ -30,6 +30,8 @@ final class MjWrapper extends MjSection
             containerWidth: $boxWidths['box'] . 'px',
             sectionGap: $gap,
             columnGap: $this->renderContext->columnGap,
+            gutter: $this->getAttribute('gutter'),
+            direction: $this->getAttribute('direction'),
         );
     }
 
