@@ -255,7 +255,7 @@ The snapshot test fixtures compare PHP output against reference HTML generated b
 npm install -g mjml
 
 for f in tests/Snapshot/Fixtures/*.mjml; do
-    npx mjml@5.4.0 "$f" --no-minify > "${f%.mjml}.html"
+    npx mjml@5.4.0 "$f" --no-minify -o "${f%.mjml}.html"
 done
 ```
 

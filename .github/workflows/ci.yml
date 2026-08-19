@@ -87,12 +87,19 @@ jobs:
           set -e
           tmpdir="$(mktemp -d)"
           drift=0
+          # Compare after dropping the CLI `<!-- FILE: ... -->` comment and
+          # normalising a trailing newline. `mjml -o` omits both; redirecting
+          # stdout (`mjml ... > file`) includes them.
+          normalize() {
+            sed '/^<!-- FILE: /d' "$1"
+            echo
+          }
           for f in tests/Snapshot/Fixtures/*.mjml; do
             base="$(basename "${f%.mjml}")"
             expected="tests/Snapshot/Fixtures/${base}.html"
             generated="${tmpdir}/${base}.html"
             mjml "$f" --no-minify -o "$generated"
-            if ! diff -u "$expected" "$generated"; then
+            if ! diff -u <(normalize "$expected") <(normalize "$generated"); then
               echo "::error file=${expected}::snapshot drifted vs. mjml@5.4.0 — regenerate the fixture"
               drift=1
             fi

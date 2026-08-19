@@ -17,7 +17,7 @@ use MjmlPHP\Validation\ValidationLevel;
  * using mjml-core 5.4.0 / mjml-cli 5.4.0
  *
  * To regenerate reference files:
- *   for f in tests/Snapshot/Fixtures/*.mjml; do npx mjml@5.4.0 "$f" --no-minify > "${f%.mjml}.html"; done
+ *   for f in tests/Snapshot/Fixtures/*.mjml; do npx mjml@5.4.0 "$f" --no-minify -o "${f%.mjml}.html"; done
  */
 final class SnapshotTest extends TestCase
 {
