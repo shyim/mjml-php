@@ -70,6 +70,10 @@ abstract class BodyComponent extends AbstractComponent
                 }
             }
 
+            // The XML parser decodes &quot; to a bare quote, which would end the attribute early.
+            // Other characters stay as MJML writes them, so placeholders like <% x %> keep working.
+            $value = str_replace('"', '&quot;', $value);
+
             $parts[] = "{$name}=\"{$value}\"";
         }
 
