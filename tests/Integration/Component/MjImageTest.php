@@ -96,4 +96,24 @@ final class MjImageTest extends AbstractIntegrationTest
             $this->extractAttribute($html, 'img', 'sizes'),
         );
     }
+
+    public function testQuoteInAttributeValueStaysInsideTheAttribute(): void
+    {
+        $mjml = '
+        <mjml>
+          <mj-body>
+            <mj-section>
+              <mj-column>
+                <mj-image src="https://example.com/logo.png" alt="The &quot;Acme&quot; logo" />
+              </mj-column>
+            </mj-section>
+          </mj-body>
+        </mjml>';
+
+        $html = $this->renderMjml($mjml);
+
+        self::assertStringContainsString('alt="The &quot;Acme&quot; logo"', $html);
+        self::assertSame('The "Acme" logo', $this->extractAttribute($html, 'img', 'alt'));
+        self::assertNull($this->extractAttribute($html, 'img', 'acme&quot;'));
+    }
 }
