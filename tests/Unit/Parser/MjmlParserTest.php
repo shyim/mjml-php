@@ -6,8 +6,10 @@ namespace MjmlPHP\Tests\Unit\Parser;
 
 use PHPUnit\Framework\TestCase;
 use MjmlPHP\Component\ComponentRegistry;
+use MjmlPHP\Mjml;
 use MjmlPHP\MjmlOptions;
 use MjmlPHP\Parser\MjmlParser;
+use MjmlPHP\Parser\ParseException;
 use MjmlPHP\Validation\ValidationLevel;
 
 final class MjmlParserTest extends TestCase
@@ -767,6 +769,34 @@ final class MjmlParserTest extends TestCase
         $node = $this->parser->parse("   \n\t  ");
         self::assertSame('mjml', $node->tagName);
         self::assertSame([], $node->children);
+    }
+
+    public function testMissingClosingTagThrows(): void
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessageMatches('/^Malformed MJML: \[FATAL\] line 1: Opening and ending tag mismatch/');
+
+        $this->parser->parse('<mjml><mj-body><mj-section><mj-column><mj-text>Hi</mj-text></mj-column></mj-body></mjml>');
+    }
+
+    public function testBareAmpersandInAttributeThrows(): void
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessageMatches('/EntityRef/');
+
+        $this->parser->parse('<mjml><mj-body><mj-button href="https://example.com/?a=1&b=2">Go</mj-button></mj-body></mjml>');
+    }
+
+    public function testRenderThrowsForMalformedMarkupInEveryValidationLevel(): void
+    {
+        foreach (ValidationLevel::cases() as $level) {
+            try {
+                Mjml::render('<mjml><mj-body><mj-section></mj-body></mjml>', new MjmlOptions(validationLevel: $level));
+                self::fail("Expected a ParseException with validation level {$level->value}.");
+            } catch (ParseException $exception) {
+                self::assertStringStartsWith('Malformed MJML: ', $exception->getMessage());
+            }
+        }
     }
 
     public function testDeeplyNestedSectionsDoNotCrash(): void

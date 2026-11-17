@@ -82,6 +82,7 @@ final class MjmlParser
         $doc->loadXML($mjml, \LIBXML_NONET | \LIBXML_NOWARNING);
 
         $collector->collect(restorePrevious: true);
+        $this->assertReadable($filePath);
 
         $root = $doc->documentElement;
 
@@ -335,6 +336,7 @@ final class MjmlParser
         $doc->loadXML($mjml, \LIBXML_NONET | \LIBXML_NOWARNING);
 
         $collector->collect();
+        $this->assertReadable($filePath);
 
         $root = $doc->documentElement;
 
@@ -343,6 +345,24 @@ final class MjmlParser
         }
 
         return $this->domToNode($root, $filePath);
+    }
+
+    /**
+     * A fatal libxml error leaves no usable tree, so rendering on would produce an empty email.
+     *
+     * @throws ParseException
+     */
+    private function assertReadable(?string $filePath): void
+    {
+        if (!$this->libxmlErrors->hasFatalErrors()) {
+            return;
+        }
+
+        $source = $filePath !== null ? " in {$filePath}" : '';
+
+        throw new ParseException(
+            "Malformed MJML{$source}: " . implode('; ', $this->libxmlErrors->getErrorMessages()),
+        );
     }
 
     /**
